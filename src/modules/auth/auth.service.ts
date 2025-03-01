@@ -7,8 +7,6 @@ import {
 import { UserService } from '../users/users.service'
 import { GenerateToken } from '../../common/config/jwt.service'
 import { User } from '../users/entity/user.entity'
-import { MoreThan, Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
 import { HashPassword } from './utils/hashPassword'
 import { randomBytes } from 'crypto'
 import { ChangePasswordDto } from './dtos/ChangePassword.dto'
@@ -32,6 +30,8 @@ import {
   SamePassword,
 } from 'src/common/constant/messages.constant'
 import { AuthInput } from './input/Auth.input'
+import { InjectModel } from '@nestjs/sequelize'
+import { Op } from 'sequelize'
 
 @Injectable()
 export class AuthService {
@@ -41,7 +41,7 @@ export class AuthService {
     private readonly redisService: RedisService,
     private readonly uploadService: UploadService,
     private readonly sendEmailService: SendEmailService,
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectModel(User) private userRepo: typeof User,
   ) {}
 
   async register (
@@ -59,17 +59,17 @@ export class AuthService {
       throw new BadRequestException(EmailUsed)
     }
 
-    const query = this.userRepository.manager.connection.createQueryRunner()
-    await query.startTransaction()
-
+    const transaction = await this.userRepo.sequelize.transaction()
     try {
-      const user = await this.userRepository.create({
-        userName,
-        email,
-        phone,
-        password: await HashPassword(createUserDto.password),
-      })
-      await this.userRepository.save(user)
+      const user = await this.userRepo.create(
+        {
+          userName,
+          email,
+          phone,
+          password: await HashPassword(createUserDto.password),
+        },
+        { transaction },
+      )
 
       if (avatar) {
         const filename = await this.uploadService.uploadImage(avatar)
@@ -79,7 +79,8 @@ export class AuthService {
       }
 
       user.fcmToken = fcmToken
-      await this.userRepository.save(user)
+      await user.save({ transaction })
+
       await this.sendEmailService.sendEmail(
         email,
         'Register in App',
@@ -87,17 +88,13 @@ export class AuthService {
       )
 
       const token = await this.generateToken.jwt(user?.email, user?.id)
-      await this.userRepository.save(user)
-      const result = { user, token }
-      // const userCacheKey = `user:${email}`
-      // await this.redisService.set(userCacheKey, result)
 
-      return result
+      await transaction.commit()
+
+      return { user, token }
     } catch (error) {
-      await query.rollbackTransaction()
+      await transaction.rollback()
       throw error
-    } finally {
-      await query.release()
     }
   }
 
@@ -114,7 +111,7 @@ export class AuthService {
     const userCacheKey = `user:${email}`
     await this.redisService.set(userCacheKey, { user, token })
     user.fcmToken = fcmToken
-    await this.userRepository.save(user)
+    await user.save()
     return { user, token }
   }
 
@@ -132,7 +129,7 @@ export class AuthService {
     user.resetToken = token
     user.resetTokenExpiry = new Date(Date.now() + 900000) // 15 minutes
     const link = `http://localhost:3000/grapql/reset-password?token=${token}`
-    await this.userRepository.save(user)
+    await user.save()
 
     await this.sendEmailService.sendEmail(
       lowerEmail,
@@ -144,58 +141,61 @@ export class AuthService {
   }
 
   async resetPassword (resetPassword: ResetPasswordDto) {
-    const query = this.userRepository.manager.connection.createQueryRunner()
-    await query.startTransaction()
+    const { password, token } = resetPassword
 
+    const transaction = await this.userRepo.sequelize.transaction()
     try {
-      const { password, token } = resetPassword
-      const user = await this.userRepository.findOne({
+      const user = await this.userRepo.findOne({
         where: {
           resetToken: token,
-          resetTokenExpiry: MoreThan(new Date(Date.now())),
+          resetTokenExpiry: { [Op.gt]: new Date() }, // Sequelize equivalent for `MoreThan`
         },
+        transaction,
       })
+
       if (!user) {
         throw new BadRequestException(InvalidToken)
       }
 
       user.password = await HashPassword(password)
-      await this.userRepository.save(user)
-      return `${user.userName} ,your password is Updated Successfully`
+      await user.save({ transaction })
+
+      await transaction.commit()
+
+      return `${user.userName}, your password is updated successfully`
     } catch (error) {
-      await query.rollbackTransaction()
+      await transaction.rollback()
       throw error
-    } finally {
-      await query.release()
     }
   }
 
   async changePassword (id: number, changePassword: ChangePasswordDto) {
-    const query = this.userRepository.manager.connection.createQueryRunner()
-    await query.startTransaction()
+    const { password, newPassword } = changePassword
+    if (password === newPassword) {
+      throw new BadRequestException(SamePassword)
+    }
 
+    const transaction = await this.userRepo.sequelize.transaction()
     try {
-      const { password, newPassword } = changePassword
-      if (password === newPassword) {
-        throw new BadRequestException(SamePassword)
-      }
-
       const user = await this.userService.findById(id)
-      if (!(user instanceof User)) {
+      if (!user) {
         throw new NotFoundException(EmailIsWrong)
       }
-      if (user.password === (await HashPassword(password))) {
+
+      const isMatch = await ComparePassword(password, user.password)
+      if (!isMatch) {
         throw new BadRequestException(OldPasswordENewPassword)
       }
 
       user.password = await HashPassword(newPassword)
-      await this.userRepository.save(user)
-      return `${user.userName} ,your password is Updated Successfully`
+      await user.save({ transaction })
+
+      await transaction.commit()
+
+      return `${user.userName}, your password is updated successfully`
     } catch (error) {
-      await query.rollbackTransaction()
+      await transaction.rollback()
       throw error
-    } finally {
-      await query.release()
     }
   }
 

@@ -7,6 +7,8 @@ import { DataBaseModule } from './common/database/database'
 import { ThrottlerModule } from './common/throttler/throttling.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/users/users.module'
+import { PostModule } from './modules/post/post.module'
+import { TranslationModule } from './common/translation/translation.module'
 
 @Module({
   imports: [
@@ -14,9 +16,11 @@ import { UserModule } from './modules/users/users.module'
     GraphqlModule,
     DataBaseModule,
     ThrottlerModule,
+    TranslationModule,
 
     AuthModule,
     UserModule,
+    PostModule,
   ],
 
   providers: [AppService, AppResolver],

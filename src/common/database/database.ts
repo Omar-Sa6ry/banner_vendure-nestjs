@@ -1,21 +1,22 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize'
+import { Post } from 'src/modules/post/entity/post.entity '
 import { User } from 'src/modules/users/entity/user.entity'
-import { Image } from '../upload/entity/image.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
+    SequelizeModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
+      useFactory: (configService: ConfigService): SequelizeModuleOptions => ({
+        dialect: 'postgres',
         host: configService.get<string>('DB_HOST'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User, Image],
+        models: [User, Post],
+        autoLoadModels: true,
         synchronize: true,
         logging: false,
       }),

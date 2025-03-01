@@ -12,14 +12,10 @@ import * as path from 'path'
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
-        path: path.join(__dirname, 'locales'),
+        path: path.join(process.cwd(), 'src/common/translation/locales/'),
         watch: true,
       },
-      resolvers: [
-        { use: QueryResolver, options: ['lang'] },
-        AcceptLanguageResolver,
-        new HeaderResolver(['x-lang']),
-      ],
+      resolvers: [new HeaderResolver(['x-lang']), new AcceptLanguageResolver()],
     }),
   ],
   exports: [I18nModule],

@@ -1,90 +1,78 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { Role, UserStatus } from 'src/common/constant/enum.constant'
 import { Exclude } from 'class-transformer'
+import { Post } from 'src/modules/post/entity/post.entity '
 import {
-  AfterInsert,
-  AfterRemove,
-  AfterUpdate,
+  Table,
   Column,
-  Entity,
+  Model,
+  DataType,
   Index,
-  PrimaryGeneratedColumn,
-} from 'typeorm'
+  Default,
+  HasMany,
+} from 'sequelize-typescript'
 
-@Entity()
 @ObjectType()
-@Index('idx_phone', ['phone'])
-@Index('idx_userName', ['userName'])
-@Index('idx_email', ['email'])
-@Index('idx_avatar', ['avatar'])
-export class User {
-  @PrimaryGeneratedColumn()
+@Table
+export class User extends Model {
   @Field(() => Int)
+  @Column({ autoIncrement: true, primaryKey: true })
   id: number
 
-  @Column({ nullable: true, unique: true })
   @Field(() => String)
+  @Column({ type: DataType.STRING, allowNull: false, unique: true })
+  @Index
   userName: string
 
-  @Column({ nullable: true })
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
+  @Column({ type: DataType.STRING, allowNull: true })
+  @Index
   avatar: string
 
-  @Column({ nullable: true })
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
+  @Column({ type: DataType.STRING, allowNull: true })
   bio: string
 
-  @Column({ unique: true })
   @Field(() => String)
+  @Column({ type: DataType.STRING, allowNull: false, unique: true })
+  @Index
   phone: string
 
-  @Column({ nullable: true, unique: true })
   @Field(() => String)
+  @Column({ type: DataType.STRING, unique: true, allowNull: false })
+  @Index
   email: string
 
-  @Column()
   @Exclude()
+  @Column({ type: DataType.STRING, allowNull: false })
   password: string
 
-  @Column({
-    type: 'enum',
-    enum: Role,
-    default: Role.USER,
-  })
   @Exclude()
+  @Column({
+    type: DataType.ENUM(...Object.values(Role)),
+    defaultValue: Role.USER,
+  })
   role: Role
 
+  @Default(UserStatus.PUBLIC)
   @Column({
-    type: 'enum',
-    enum: UserStatus,
-    default: UserStatus.PUBLIC,
+    type: DataType.ENUM(...Object.values(UserStatus)),
+    defaultValue: UserStatus.PUBLIC,
   })
   status: UserStatus
 
-  @Column({ nullable: true })
   @Exclude()
+  @Column({ type: DataType.STRING, allowNull: true })
   resetToken?: string
 
-  @Column({ type: 'timestamp', nullable: true })
   @Exclude()
+  @Column({ type: DataType.DATE, allowNull: true })
   resetTokenExpiry?: Date | null
 
-  @Column({ nullable: true })
   @Exclude()
-  fcmToken: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  fcmToken?: string
 
-  @AfterInsert()
-  logInsert () {
-    console.log('Inserted User with id: ' + this.id)
-  }
-
-  @AfterUpdate()
-  logUpdate () {
-    console.log('Updated User with id: ' + this.id)
-  }
-
-  @AfterRemove()
-  logRemove () {
-    console.log('Removed User with id: ' + this.id)
-  }
+  @HasMany(() => Post)
+  posts: Post[]
 }

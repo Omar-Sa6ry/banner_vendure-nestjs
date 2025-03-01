@@ -65,18 +65,18 @@ export class UserResolver {
     return { data: await this.usersService.updateUser(updateUserDto, user?.id) }
   }
 
-  @Query(returns => String)
-  @Auth(Role.ADMIN, Role.MANAGER)
-  async deleteUser (@CurrentUser() user: CurrentUserDto) {
-    return await this.usersService.deleteUser(user.id)
-  }
+  // @Query(returns => String)
+  // @Auth(Role.ADMIN, Role.MANAGER)
+  // async deleteUser (@CurrentUser() user: CurrentUserDto) {
+  //   return await this.usersService.deleteUser(user.id)
+  // }
 
-  @Mutation(returns => String)
-  @Auth(Role.ADMIN, Role.MANAGER)
-  async UpdateUserRole (
-    @Args('email') email: string,
-    @Args('companyId', ParseIntPipe) companyId: number,
-  ) {
-    return await this.usersService.editUserRole(email)
-  }
+  // @Mutation(returns => String)
+  // @Auth(Role.ADMIN, Role.MANAGER)
+  // async UpdateUserRole (
+  //   @Args('email') email: string,
+  //   @Args('companyId', ParseIntPipe) companyId: number,
+  // ) {
+  //   return await this.usersService.editUserRole(email)
+  // }
 }

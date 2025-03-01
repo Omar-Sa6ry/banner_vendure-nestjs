@@ -1,0 +1,8 @@
+{
+  "CREATED": "Post created successfully",
+  "UPDATED": "Post updated successfully",
+  "DELETED": "Post deleted successfully",
+  "NOT_FOUND": "Post not found",
+  "NOT_FOUNDS": "Posts not found",
+  "POSTNOTEQUALUSERID": "Posts not found"
+}

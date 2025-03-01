@@ -21,6 +21,10 @@ export const AvatarNotFound = 'Avatar Not Found'
 export const ImageNotMatch = 'This image is not match with userId'
 export const ImagesNotFound = 'Images not Found'
 
+// paganition
+export const Limit = 12
+export const Page = 1
+
 // Decerator
 export const CurrentUserMsg = 'User not found in request'
 

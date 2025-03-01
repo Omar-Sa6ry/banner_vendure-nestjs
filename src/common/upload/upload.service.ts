@@ -1,19 +1,13 @@
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateImagDto } from 'src/common/upload/dtos/createImage.dto'
 import { UploadApiResponse } from 'cloudinary'
 import { ConfigService } from '@nestjs/config'
-import { configureCloudinary } from 'src/common/config/cloudinary'
+import { configureCloudinary } from './config/cloudinary'
 import { v2 as cloudinary } from 'cloudinary'
-import { Image } from './entity/image.entity'
 
 @Injectable()
 export class UploadService {
-  constructor (
-    private configService: ConfigService,
-    @InjectRepository(Image) private imageRepository: Repository<Image>,
-  ) {
+  constructor (private configService: ConfigService) {
     configureCloudinary(this.configService)
   }
 
@@ -72,106 +66,27 @@ export class UploadService {
     }
   }
 
-  async uploadImages (
-    createImageInput: CreateImagDto[],
-    postId: number,
-  ): Promise<string[]> {
-    let images: string[] = []
-
-    const queryRunner =
-      this.imageRepository.manager.connection.createQueryRunner()
-    await queryRunner.startTransaction()
-
+  async deleteImage (imageUrl: string): Promise<void> {
     try {
-      await Promise.all(
-        createImageInput.map(async img => {
-          const imagePath = await this.uploadImage(img, 'posts')
+      const publicId = imageUrl.split('/').pop()?.split('.')[0]
 
-          if (typeof imagePath === 'string') {
-            const image = this.imageRepository.create({
-              path: imagePath,
-              postId,
-            })
-
-            await queryRunner.manager.save(image)
-            images.push(imagePath)
-          }
-        }),
-      )
-
-      await queryRunner.commitTransaction()
-    } catch (error) {
-      await queryRunner.rollbackTransaction()
-      throw error // Rethrow the error to handle it outside
-    } finally {
-      await queryRunner.release()
-    }
-
-    return images
-  }
-
-  async deleteImageByPath (imagePath: string): Promise<boolean> {
-    const image = await this.imageRepository.findOne({
-      where: { path: imagePath },
-    })
-
-    if (!image) {
-      throw new HttpException('Image not found', HttpStatus.NOT_FOUND)
-    }
-
-    const publicId = image.path.split('/').pop()?.split('.')[0]
-
-    try {
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId)
+      if (!publicId) {
+        throw new HttpException('Invalid Image URL', HttpStatus.BAD_REQUEST)
       }
 
-      await this.imageRepository.delete({ path: imagePath })
+      const result = await cloudinary.uploader.destroy(publicId)
 
-      console.log(`Deleted image with path ${imagePath} successfully`)
-      return true
+      if (result.result !== 'ok') {
+        throw new HttpException(
+          'Failed to delete image',
+          HttpStatus.BAD_REQUEST,
+        )
+      }
+
+      console.log('Deleted Image:', imageUrl)
     } catch (error) {
-      console.error('Cloudinary Delete Error:', error)
-      throw new HttpException(
-        'Failed to delete image',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      )
-    }
-  }
-
-  async deleteImagesByPostId (postId: number): Promise<boolean> {
-    const images = await this.imageRepository.find({
-      where: { postId },
-    })
-
-    if (images.length === 0) {
-      throw new HttpException(
-        'No images found for this post',
-        HttpStatus.NOT_FOUND,
-      )
-    }
-
-    try {
-      await Promise.all(
-        images.map(async image => {
-          const publicId = image.path.split('/').pop()?.split('.')[0]
-
-          if (publicId) {
-            await cloudinary.uploader.destroy(publicId)
-          }
-        }),
-      )
-
-      await this.imageRepository.delete({ postId })
-
-      console.log(`Deleted all images for post ${postId} successfully`)
-      return true
-    } catch (error) {
-      console.error('Cloudinary Delete Error:', error)
-      throw new HttpException(
-        'Failed to delete images',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      )
+      console.error('Delete Image Error:', error)
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 }
