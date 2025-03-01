@@ -1,0 +1,92 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Int!
+  userName: String!
+  avatar: String
+  bio: String
+  phone: String!
+  email: String!
+}
+
+type AuthOutPut {
+  user: User!
+  token: String!
+}
+
+type AuthResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: AuthOutPut
+}
+
+type UserResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: User
+}
+
+type Query {
+  sayHello: String!
+  getUserById(id: Float!): UserResponse!
+  getUserByEmail(email: String!): UserResponse!
+  getUserByUserName(userName: String!): UserResponse!
+  deleteUser: String!
+}
+
+type Mutation {
+  register(fcmToken: String!, createUserDto: CreateUserDto!): AuthResponse!
+  login(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
+  forgotPassword(email: String!): String!
+  resetPassword(resetPasswordDto: ResetPasswordDto!): String!
+  changePassword(changePasswordDto: ChangePasswordDto!): String!
+  adminLogin(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
+  managerLogin(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
+  logout: Boolean!
+  updateUser(updateUserDto: UpdateUserDto!): UserResponse!
+  UpdateUserRole(email: String!, companyId: Float!): String!
+}
+
+input CreateUserDto {
+  userName: String!
+  email: String!
+  password: String!
+  phone: String!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+input ResetPasswordDto {
+  token: String!
+  password: String!
+}
+
+input ChangePasswordDto {
+  password: String!
+  newPassword: String!
+}
+
+input UpdateUserDto {
+  userName: String
+  avatar: CreateImagDto
+  email: String
+  phone: String
+}
+
+input CreateImagDto {
+  name: String!
+  breed: String!
+  image: Upload!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
