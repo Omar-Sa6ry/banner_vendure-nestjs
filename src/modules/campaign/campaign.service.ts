@@ -10,7 +10,7 @@ import {
   CampaignInput,
   CampaignInputResponse,
   CampaignsInputResponse,
-} from './inputs/campain.input'
+} from './input/campain.input'
 import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { User } from '../users/entity/user.entity'
 import { RedisService } from 'src/common/redis/redis.service'

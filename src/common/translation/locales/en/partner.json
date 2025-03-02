@@ -1,0 +1,7 @@
+{
+  "CREATED": "Partner created successfully",
+  "UPDATED": "Partner updated successfully",
+  "DELETED": "Partner deleted successfully",
+  "NOT_FOUND": "Partner not found",
+  "NOT_FOUNDS": "Partners not found"
+}

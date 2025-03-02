@@ -14,6 +14,7 @@ import {
 @ObjectType()
 @Table({
   tableName: 'likes',
+  timestamps: true,
   indexes: [
     { name: 'idx_like_postId', fields: ['postId'] },
     { name: 'idx_like_userId', fields: ['userId'] },

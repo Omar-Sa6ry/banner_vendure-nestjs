@@ -29,7 +29,7 @@ export class CampaignResolver {
   }
 
   @Query(() => CampaignResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCampaignById (
     @Context() context,
     @Args('id', { type: () => Int }) id: number,
@@ -44,7 +44,7 @@ export class CampaignResolver {
   }
 
   @Query(() => CampaignsResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCampaigns (
     @Args('campaignDto') campaignDto: CampaignDto,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
@@ -54,7 +54,7 @@ export class CampaignResolver {
   }
 
   @Query(() => CampaignsResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getListCampaigns (
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
@@ -63,7 +63,7 @@ export class CampaignResolver {
   }
 
   @Mutation(() => CampaignResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async UpdateCampaign (
     @Args('id', { type: () => Int }) id: number,
     @Args('updateCampaignDto') updateCampaignDto: CampaignDto,

@@ -11,11 +11,14 @@ import {
   CreatedAt,
   UpdatedAt,
   DataType,
+  HasMany,
 } from 'sequelize-typescript'
+import { Partner } from 'src/modules/partner/entity/partner.entity'
 
 @ObjectType()
 @Table({
   tableName: 'campaigns',
+  timestamps: true,
   indexes: [
     { name: 'idx_campaign_name', fields: ['name'] },
     { name: 'idx_campaign_status', fields: ['status'] },
@@ -74,4 +77,7 @@ export class Campaign extends Model<Campaign> {
   @BelongsTo(() => User)
   @Field(() => User)
   user: User
+
+  @HasMany(() => Partner)
+  partners: Partner[]
 }

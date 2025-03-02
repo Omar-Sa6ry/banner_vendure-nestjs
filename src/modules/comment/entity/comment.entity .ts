@@ -15,6 +15,7 @@ import {
 @ObjectType()
 @Table({
   tableName: 'comments',
+  timestamps: true,
   indexes: [
     {
       name: 'idx_comment_postId_userId',

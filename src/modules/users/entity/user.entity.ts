@@ -12,9 +12,10 @@ import {
   Index,
   HasMany,
 } from 'sequelize-typescript'
+import { Partner } from 'src/modules/partner/entity/partner.entity'
 
 @ObjectType()
-@Table
+@Table({ timestamps: true })
 export class User extends Model {
   @Field(() => Int)
   @Column({ autoIncrement: true, primaryKey: true })
@@ -69,6 +70,9 @@ export class User extends Model {
 
   @HasMany(() => Campaign)
   campaign: Campaign[]
+
+  @HasMany(() => Partner)
+  partner: Partner[]
 
   @HasMany(() => Post)
   posts: Post[]

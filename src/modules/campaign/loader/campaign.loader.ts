@@ -1,7 +1,7 @@
 import * as DataLoader from 'dataloader'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
-import { CampaignInput } from '../inputs/campain.input'
+import { CampaignInput } from '../input/campain.input'
 import { User } from 'src/modules/users/entity/user.entity'
 import { InjectModel } from '@nestjs/sequelize'
 import { Op } from 'sequelize'
@@ -24,7 +24,7 @@ export class CampaignLoader {
 
         const userIds = [...new Set(campaigns.map(campaign => campaign.userId))]
         const users = await this.userRepo.findAll({
-          where: { campaignId: { [Op.in]: keys } },
+          where: { campaignId: { [Op.in]: userIds } },
         })
         const userMap = new Map(users.map(user => [user.id, user]))
 

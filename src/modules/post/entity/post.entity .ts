@@ -14,7 +14,7 @@ import {
 import { Like } from 'src/modules/like/entity/like.entity '
 
 @ObjectType()
-@Table
+@Table({ timestamps: true })
 export class Post extends Model<Post> {
   @Field(() => Int)
   @Column({ autoIncrement: true, primaryKey: true })

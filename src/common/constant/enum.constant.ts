@@ -1,6 +1,7 @@
 export enum Role {
   USER = 'user',
   ADMIN = 'admin',
+  PARTNER = 'partner',
   MANAGER = 'manager',
 }
 
@@ -14,5 +15,3 @@ export enum CampaignStatus {
   CANCELLED = 'cancelled',
   REJECTED = 'rejected',
 }
-
-
