@@ -1,6 +1,8 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
-import { Role, UserStatus } from 'src/common/constant/enum.constant'
+import { Role } from 'src/common/constant/enum.constant'
 import { Exclude } from 'class-transformer'
+import { Like } from 'src/modules/like/entity/like.entity '
+import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Post } from 'src/modules/post/entity/post.entity '
 import {
   Table,
@@ -8,10 +10,8 @@ import {
   Model,
   DataType,
   Index,
-  Default,
   HasMany,
 } from 'sequelize-typescript'
-import { Like } from 'src/modules/like/entity/like.entity '
 
 @ObjectType()
 @Table
@@ -55,13 +55,6 @@ export class User extends Model {
   })
   role: Role
 
-  @Default(UserStatus.PUBLIC)
-  @Column({
-    type: DataType.ENUM(...Object.values(UserStatus)),
-    defaultValue: UserStatus.PUBLIC,
-  })
-  status: UserStatus
-
   @Exclude()
   @Column({ type: DataType.STRING, allowNull: true })
   resetToken?: string
@@ -73,6 +66,9 @@ export class User extends Model {
   @Exclude()
   @Column({ type: DataType.STRING, allowNull: true })
   fcmToken?: string
+
+  @HasMany(() => Campaign)
+  campaign: Campaign[]
 
   @HasMany(() => Post)
   posts: Post[]

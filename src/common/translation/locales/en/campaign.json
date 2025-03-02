@@ -1,0 +1,7 @@
+{
+  "CREATED": "Campaign created successfully",
+  "UPDATED": "Campaign updated successfully",
+  "DELETED": "Campaign deleted successfully",
+  "NOT_FOUND": "Campaign not found",
+  "NOT_FOUNDS": "Campaigns not found"
+}

@@ -11,6 +11,7 @@ import { PostModule } from './modules/post/post.module'
 import { TranslationModule } from './common/translation/translation.module'
 import { CommentModule } from './modules/comment/comment.module'
 import { LikeModule } from './modules/like/like.module'
+import { CampaignModule } from './modules/campaign/campaign.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LikeModule } from './modules/like/like.module'
 
     AuthModule,
     UserModule,
+    CampaignModule,
     PostModule,
     CommentModule,
     LikeModule,

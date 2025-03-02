@@ -4,7 +4,15 @@ export enum Role {
   MANAGER = 'manager',
 }
 
-export enum UserStatus {
-  PUBLIC = 'public',
-  PRIVACY = 'privacy',
+export enum CampaignStatus {
+  DRAFT = 'draft',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  ACTIVE = 'active',
+  PAUSED = 'paused',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  REJECTED = 'rejected',
 }
+
+
