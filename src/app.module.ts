@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/users/users.module'
 import { PostModule } from './modules/post/post.module'
 import { TranslationModule } from './common/translation/translation.module'
+import { CommentModule } from './modules/comment/comment.module'
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { TranslationModule } from './common/translation/translation.module'
 
     AuthModule,
     UserModule,
-    PostModule,
+    PostModule,CommentModule
   ],
 
   providers: [AppService, AppResolver],

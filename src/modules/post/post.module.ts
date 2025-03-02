@@ -6,9 +6,10 @@ import { RedisModule } from 'src/common/redis/redis.module'
 import { Post } from './entity/post.entity '
 import { UploadModule } from '../../common/upload/upload.module'
 import { User } from '../users/entity/user.entity'
-import { UploadService } from '../../common/upload/upload.service'
 import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { SequelizeModule } from '@nestjs/sequelize'
+import { postLoader } from './loader/comment.loader'
+import { Comment } from '../comment/entity/comment.entity '
 
 @Module({
   imports: [
@@ -17,8 +18,8 @@ import { SequelizeModule } from '@nestjs/sequelize'
     RedisModule,
     // LikeModule,
     WebSocketModule,
-    SequelizeModule.forFeature([Post, User]),
+    SequelizeModule.forFeature([Post, Comment, User]),
   ],
-  providers: [PostResolver, PostService, UploadService],
+  providers: [PostResolver, PostService, postLoader],
 })
 export class PostModule {}

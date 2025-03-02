@@ -1,9 +1,9 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql'
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
-// import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
+import { CommentInput } from 'src/modules/comment/input/comment.input'
 
 @InputType()
 export class PostInput {
@@ -25,8 +25,8 @@ export class PostInput {
   // @Field()
   // likes: number
 
-  // @Field(() => [Comment], { nullable: true })
-  // comments: Comment[]
+  @Field(() => [CommentInput], { nullable: true })
+  comments: CommentInput[]
 
   @Field()
   @IsDate()

@@ -1,13 +1,13 @@
-import { Field, ObjectType } from '@nestjs/graphql'
+import { Field, InputType } from '@nestjs/graphql'
 import { Expose } from 'class-transformer'
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
-import { CommentInput } from 'src/modules/comment/input/comment.input'
+import { Post } from 'src/modules/post/entity/post.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 
-@ObjectType()
-export class PostInput {
+@InputType()
+export class CommentInput {
   @Field()
   @IsInt()
   id: number
@@ -16,29 +16,22 @@ export class PostInput {
   @IsString()
   content: string
 
-  @Field()
-  @IsString()
-  imageUrl: string
+  @Field(() => Post)
+  post: Post
 
   @Field(() => User)
   user: User
-
-  // @Field()
-  // likes: number
-
-  @Field(() => [CommentInput], { nullable: true })
-  comments: CommentInput[]
 
   @Field()
   @IsDate()
   createdAt: Date
 }
 
-@ObjectType()
-export class PostsResponse extends BaseResponse {
-  @Field(() => [PostInput], { nullable: true })
+@InputType()
+export class CommentsInputResponse extends BaseResponse {
+  @Field(() => [CommentInput], { nullable: true })
   @Expose()
-  items: PostInput[]
+  items: CommentInput[]
 
   @IsOptional()
   @Field(() => PaginationInfo, { nullable: true })
@@ -46,9 +39,9 @@ export class PostsResponse extends BaseResponse {
   pagination?: PaginationInfo
 }
 
-@ObjectType()
-export class PostResponse extends BaseResponse {
-  @Field(() => PostInput, { nullable: true })
+@InputType()
+export class CommentInputResponse extends BaseResponse {
+  @Field(() => CommentInput, { nullable: true })
   @Expose()
-  data: PostInput
+  data: CommentInput
 }

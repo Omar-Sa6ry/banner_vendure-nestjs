@@ -10,14 +10,16 @@ import { RedisService } from 'src/common/redis/redis.service'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { CreateImagDto } from 'src/common/upload/dtos/createImage.dto'
 import { I18nService } from 'nestjs-i18n'
+import { InjectModel } from '@nestjs/sequelize'
+import { Comment } from '../comment/entity/comment.entity '
+import { postLoader } from './loader/comment.loader'
+import { Op } from 'sequelize'
+import { Limit, Page } from '../../common/constant/messages.constant'
 import {
   PostInput,
   PostInputResponse,
   PostsInputResponse,
 } from './input/Post.input'
-import { InjectModel } from '@nestjs/sequelize'
-import { Op } from 'sequelize'
-import { Limit, Page } from '../../common/constant/messages.constant'
 
 @Injectable()
 export class PostService {
@@ -26,9 +28,11 @@ export class PostService {
     private readonly redisService: RedisService,
     private readonly uploadService: UploadService,
     // private readonly likeService: LikeService,
+    private postLoader: postLoader,
     private readonly websocketGateway: WebSocketMessageGateway,
     @InjectModel(Post) private postRepo: typeof Post,
-    @InjectModel(User) private userRepo: typeof User, // @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    @InjectModel(User) private userRepo: typeof User,
+    @InjectModel(Comment) private commentRepo: typeof Comment,
   ) {}
 
   async create (
@@ -57,6 +61,7 @@ export class PostService {
         id: post.id,
         content: post.content,
         user,
+        comments: [],
         imageUrl: image,
         createdAt: post.createdAt,
       }
@@ -98,9 +103,11 @@ export class PostService {
       throw new BadRequestException(await this.i18n.t('user.NOT_FOUND'))
     }
 
-    // const comments = await this.commentRepository.find({
-    //   where: { id: post.userId },
-    // })
+    const comments = await this.commentRepo.findAll({
+      where: { postId: post.id },
+      order: [['createdAt', 'DESC']],
+      limit: 10,
+    })
 
     // const likes = await this.likeService.numPostLikes(post.id)
 
@@ -109,7 +116,7 @@ export class PostService {
       content: post.content,
       imageUrl: post.imageUrl,
       user,
-      // comments,
+      comments,
       // likes,
       createdAt: post.createdAt,
     }
@@ -122,22 +129,32 @@ export class PostService {
 
   async getContent (
     content?: string,
-    limit: number = Limit,
     page: number = Page,
+    limit: number = Limit,
   ): Promise<PostsInputResponse> {
-    const { rows: posts, count: total } = await this.postRepo.findAndCountAll({
+    const { rows: data, count: total } = await this.postRepo.findAndCountAll({
       where: { content: { [Op.iLike]: `%${content}%` } },
       limit,
       offset: (page - 1) * limit,
-      order: [['createdAt', 'ASC']],
+      order: [['createdAt', 'DESC']],
     })
 
-    if (posts.length === 0) {
+    if (data.length === 0) {
       throw new NotFoundException(await this.i18n.t('post.NOT_FOUNDS'))
     }
 
+    const postsIds = data.map(post => post.id)
+    const posts = await this.postLoader.loadMany(postsIds)
+
+    const items: PostInput[] = data.map((p, index) => {
+      const post = posts[index]
+      if (!post) throw new NotFoundException(this.i18n.t('post.NOT_FOUND'))
+
+      return post
+    })
+
     return {
-      items: posts,
+      items,
       pagination: {
         totalItems: total,
         currentPage: page,
@@ -151,22 +168,32 @@ export class PostService {
     limit: number = Limit,
     page: number = Page,
   ): Promise<PostsInputResponse> {
-    const { rows: posts, count: total } = await this.postRepo.findAndCountAll({
+    const { rows: data, count: total } = await this.postRepo.findAndCountAll({
       where: { userId },
       limit,
       offset: (page - 1) * limit,
-      order: [['createdAt', 'ASC']],
+      order: [['createdAt', 'DESC']],
     })
 
-    if (posts.length === 0) {
+    if (data.length === 0) {
       throw new NotFoundException(await this.i18n.t('post.NOT_FOUNDS'))
     }
+
+    const postsIds = data.map(post => post.id)
+    const posts = await this.postLoader.loadMany(postsIds)
+
+    const items: PostInput[] = data.map((p, index) => {
+      const post = posts[index]
+      if (!post) throw new NotFoundException(this.i18n.t('post.NOT_FOUND'))
+
+      return post
+    })
 
     const relationCacheKey = `posts:${userId}`
     await this.redisService.set(relationCacheKey, posts)
 
     return {
-      items: posts,
+      items,
       pagination: {
         totalItems: total,
         currentPage: page,
@@ -207,12 +234,19 @@ export class PostService {
         userId,
       })
 
+      const comments = await this.commentRepo.findAll({
+        where: { postId: post.id },
+        order: [['createdAt', 'DESC']],
+        limit: 10,
+      })
+
       const result: PostInputResponse = {
         message: await this.i18n.t('post.UPDATED'),
         data: {
           id: post.id,
           content: post.content,
           user,
+          comments,
           imageUrl: post.imageUrl,
           createdAt: post.createdAt,
         },
@@ -229,7 +263,7 @@ export class PostService {
     }
   }
 
-  async delete (userId: number, id: number): Promise<string> {
+  async delete (userId: number, id: number): Promise<PostInputResponse> {
     const transaction = await this.postRepo.sequelize.transaction()
 
     try {
@@ -255,7 +289,7 @@ export class PostService {
       })
 
       await transaction.commit()
-      return await this.i18n.t('post.DELETED')
+      return { message: await this.i18n.t('post.DELETED'), data: null }
     } catch (error) {
       await transaction.rollback()
       throw error

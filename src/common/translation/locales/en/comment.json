@@ -1,0 +1,8 @@
+{
+  "CREATED": "Comment created successfully",
+  "UPDATED": "Comment updated successfully",
+  "DELETED": "Comment deleted successfully",
+  "NOT_FOUND": "Comment not found",
+  "NOT_FOUNDS": "Comments not found",
+  "COMMENTNOTEQUALUSERID": "Comments not found"
+}
