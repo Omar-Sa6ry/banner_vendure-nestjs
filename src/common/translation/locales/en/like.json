@@ -1,0 +1,8 @@
+{
+  "CREATED": "Like created successfully",
+  "UPDATED": "Like updated successfully",
+  "DELETED": "Like deleted successfully",
+  "NOT_FOUND": "Like not found",
+  "NOT_FOUNDS": "No Likes found",
+  "LIKENOTEQUALUSERID": "Likes not found"
+}

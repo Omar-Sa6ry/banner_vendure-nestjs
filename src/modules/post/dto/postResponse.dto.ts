@@ -1,9 +1,9 @@
-import { Field, ObjectType } from '@nestjs/graphql'
+import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { Expose } from 'class-transformer'
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
-import { CommentInput } from 'src/modules/comment/input/comment.input'
+import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 
 @ObjectType()
@@ -23,11 +23,11 @@ export class PostInput {
   @Field(() => User)
   user: User
 
-  // @Field()
-  // likes: number
+  @Field(() => Int)
+  likes: number
 
-  @Field(() => [CommentInput], { nullable: true })
-  comments: CommentInput[]
+  @Field(() => [Comment], { nullable: true })
+  comments: Comment[]
 
   @Field()
   @IsDate()

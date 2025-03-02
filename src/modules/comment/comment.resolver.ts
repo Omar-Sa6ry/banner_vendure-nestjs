@@ -8,10 +8,15 @@ import { CurrentUserDto } from 'src/common/dtos/currentUser.dto'
 import { Post } from '../post/entity/post.entity '
 import { Comment } from './entity/comment.entity '
 import { CommentResponse, CommentsResponse } from './dto/CommentResponse.dto'
+import { RedisService } from 'src/common/redis/redis.service'
+import { CommentInputResponse } from './input/comment.input'
 
 @Resolver(() => Comment)
 export class CommentResolver {
-  constructor (private readonly commentService: CommentService) {}
+  constructor (
+    private readonly redisService: RedisService,
+    private readonly commentService: CommentService,
+  ) {}
 
   @Mutation(() => CommentResponse)
   @Auth(Role.USER)
@@ -27,6 +32,12 @@ export class CommentResolver {
   async getCommentById (
     @Args('id', { type: () => Int }) id: number,
   ): Promise<CommentResponse> {
+    const commentCacheKey = `comment:${id}`
+    const cachedComment = await this.redisService.get(commentCacheKey)
+    if (cachedComment instanceof CommentInputResponse) {
+      return { ...cachedComment }
+    }
+
     return await this.commentService.getById(id)
   }
 

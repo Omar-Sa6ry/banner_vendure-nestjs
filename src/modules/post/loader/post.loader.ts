@@ -7,6 +7,7 @@ import { Op } from 'sequelize'
 import { I18nService } from 'nestjs-i18n'
 import { PostInput } from '../input/Post.input'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
+import { Like } from 'src/modules/like/entity/like.entity '
 
 @Injectable()
 export class postLoader {
@@ -16,6 +17,7 @@ export class postLoader {
     @InjectModel(Comment) private commentRepo: typeof Comment,
     @InjectModel(Post) private postRepo: typeof Post,
     @InjectModel(User) private userRepo: typeof User,
+    @InjectModel(Like) private likeRepo: typeof Like,
     private readonly i18n: I18nService,
   ) {
     this.loader = new DataLoader<number, PostInput>(async (keys: number[]) => {
@@ -26,6 +28,17 @@ export class postLoader {
       const postIds = [...new Set(posts.map(post => post.id))]
       const comments = await this.commentRepo.findAll({
         where: { postId: { [Op.in]: postIds } },
+      })
+
+      const likes = await this.likeRepo.findAll({
+        where: { postId: { [Op.in]: postIds } },
+      })
+      const likeMap = new Map<number, Like[]>()
+      likes.forEach(like => {
+        if (!likeMap.has(like.postId)) {
+          likeMap.set(like.postId, [])
+        }
+        likeMap.get(like.postId)?.push(like)
       })
 
       const userIds = [...new Set(posts.map(post => post.userId))]
@@ -49,11 +62,13 @@ export class postLoader {
 
         const comments = commentMap.get(id)
         const user = userMap.get(post.userId)
+        const likes = likeMap.get(id).length
 
         return {
           ...post,
           user,
           comments,
+          likes,
         }
       })
     })

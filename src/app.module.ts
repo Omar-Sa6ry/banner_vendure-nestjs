@@ -10,6 +10,7 @@ import { UserModule } from './modules/users/users.module'
 import { PostModule } from './modules/post/post.module'
 import { TranslationModule } from './common/translation/translation.module'
 import { CommentModule } from './modules/comment/comment.module'
+import { LikeModule } from './modules/like/like.module'
 
 @Module({
   imports: [
@@ -21,7 +22,9 @@ import { CommentModule } from './modules/comment/comment.module'
 
     AuthModule,
     UserModule,
-    PostModule,CommentModule
+    PostModule,
+    CommentModule,
+    LikeModule,
   ],
 
   providers: [AppService, AppResolver],

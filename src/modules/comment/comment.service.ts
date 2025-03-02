@@ -17,6 +17,8 @@ import {
   CommentInputResponse,
   CommentsInputResponse,
 } from './input/comment.input'
+import { LikeService } from '../like/like.service'
+import { PostInput } from '../post/input/Post.input'
 
 @Injectable()
 export class CommentService {
@@ -26,6 +28,7 @@ export class CommentService {
     @InjectModel(User) private userRepo: typeof User,
     private readonly i18n: I18nService,
     private commentLoader: CommentLoader,
+    private readonly likeService: LikeService,
     private readonly redisService: RedisService,
     private readonly websocketGateway: WebSocketMessageGateway,
   ) {}
@@ -59,14 +62,22 @@ export class CommentService {
         { transaction },
       )
 
+      const comments = await this.commentRepo.findAll({
+        where: { postId: post.id },
+      })
+      const likes = +(await this.likeService.numPostLikes(post.id)).message
       await transaction.commit()
 
       const data: CommentInput = {
         id: comment.id,
-        content,
-        post,
-        user,
         createdAt: comment.createdAt,
+        user,
+        content,
+        post: {
+          ...post,
+          comments,
+          likes,
+        },
       }
 
       this.websocketGateway.broadcast('commentWrite', {
@@ -74,7 +85,7 @@ export class CommentService {
         userId,
       })
 
-      const relationCacheKey = `post:${post.id}`
+      const relationCacheKey = `comment:${comment.id}`
       await this.redisService.set(relationCacheKey, data)
 
       return {
@@ -113,14 +124,19 @@ export class CommentService {
       throw new NotFoundException(await this.i18n.t('post.NOT_FOUND'))
     }
 
+    const comments = await this.commentRepo.findAll({
+      where: { postId: post.id },
+    })
+    const likes = +(await this.likeService.numPostLikes(post.id)).message
+
     const data: CommentInput = {
       id: comment.id,
       content: comment.content,
-      post,
+      post: { ...post, likes, comments },
       user,
       createdAt: comment.createdAt,
     }
-    const relationCacheKey = `post:${post.id}`
+    const relationCacheKey = `comment:${post.id}`
     await this.redisService.set(relationCacheKey, data)
 
     return { data }
@@ -157,14 +173,19 @@ export class CommentService {
       throw new NotFoundException(await this.i18n.t('comment.NOT_FOUND'))
     }
 
+    const comments = await this.commentRepo.findAll({
+      where: { postId: post.id },
+    })
+    const likes = +(await this.likeService.numPostLikes(post.id)).message
+
     const data: CommentInput = {
       id: comment.id,
       content,
-      post,
+      post: { ...post, likes, comments },
       user,
       createdAt: comment.createdAt,
     }
-    const relationCacheKey = `post:${post.id}`
+    const relationCacheKey = `comment:${comment.id}`
     await this.redisService.set(relationCacheKey, data)
 
     return { data }
@@ -349,14 +370,19 @@ export class CommentService {
       userId,
     })
 
+    const comments = await this.commentRepo.findAll({
+      where: { postId: post.id },
+    })
+    const likes = +(await this.likeService.numPostLikes(post.id)).message
+
     const data: CommentInput = {
       id: comment.id,
       content: comment.content,
-      post,
+      post: { ...post, likes, comments },
       user,
       createdAt: comment.createdAt,
     }
-    const relationCacheKey = `post:${post.id}`
+    const relationCacheKey = `comment:${post.id}`
     await this.redisService.set(relationCacheKey, data)
 
     return { message: await this.i18n.t('comment.UPDATED'), data }

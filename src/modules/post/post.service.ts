@@ -1,3 +1,4 @@
+import { LikeService } from './../like/like.service'
 import {
   BadRequestException,
   Injectable,
@@ -12,7 +13,7 @@ import { CreateImagDto } from 'src/common/upload/dtos/createImage.dto'
 import { I18nService } from 'nestjs-i18n'
 import { InjectModel } from '@nestjs/sequelize'
 import { Comment } from '../comment/entity/comment.entity '
-import { postLoader } from './loader/comment.loader'
+import { postLoader } from './loader/post.loader'
 import { Op } from 'sequelize'
 import { Limit, Page } from '../../common/constant/messages.constant'
 import {
@@ -26,9 +27,10 @@ export class PostService {
   constructor (
     private readonly i18n: I18nService,
     private readonly redisService: RedisService,
+    private readonly likeService: LikeService,
     private readonly uploadService: UploadService,
     // private readonly likeService: LikeService,
-    private postLoader: postLoader,
+    private readonly postLoader: postLoader,
     private readonly websocketGateway: WebSocketMessageGateway,
     @InjectModel(Post) private postRepo: typeof Post,
     @InjectModel(User) private userRepo: typeof User,
@@ -61,6 +63,7 @@ export class PostService {
         id: post.id,
         content: post.content,
         user,
+        likes: 0,
         comments: [],
         imageUrl: image,
         createdAt: post.createdAt,
@@ -109,7 +112,7 @@ export class PostService {
       limit: 10,
     })
 
-    // const likes = await this.likeService.numPostLikes(post.id)
+    const likes = +(await this.likeService.numPostLikes(post.id)).message
 
     const data: PostInput = {
       id: post.id,
@@ -117,7 +120,7 @@ export class PostService {
       imageUrl: post.imageUrl,
       user,
       comments,
-      // likes,
+      likes,
       createdAt: post.createdAt,
     }
 
@@ -165,8 +168,8 @@ export class PostService {
 
   async userPosts (
     userId: number,
-    limit: number = Limit,
     page: number = Page,
+    limit: number = Limit,
   ): Promise<PostsInputResponse> {
     const { rows: data, count: total } = await this.postRepo.findAndCountAll({
       where: { userId },
@@ -240,6 +243,8 @@ export class PostService {
         limit: 10,
       })
 
+      const likes = +(await this.likeService.numPostLikes(post.id)).message
+
       const result: PostInputResponse = {
         message: await this.i18n.t('post.UPDATED'),
         data: {
@@ -247,6 +252,7 @@ export class PostService {
           content: post.content,
           user,
           comments,
+          likes,
           imageUrl: post.imageUrl,
           createdAt: post.createdAt,
         },

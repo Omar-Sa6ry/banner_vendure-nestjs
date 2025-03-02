@@ -8,17 +8,19 @@ import { UploadModule } from '../../common/upload/upload.module'
 import { User } from '../users/entity/user.entity'
 import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { SequelizeModule } from '@nestjs/sequelize'
-import { postLoader } from './loader/comment.loader'
+import { postLoader } from './loader/post.loader'
 import { Comment } from '../comment/entity/comment.entity '
+import { LikeModule } from '../like/like.module'
+import { Like } from '../like/entity/like.entity '
 
 @Module({
   imports: [
     UserModule,
     UploadModule,
+    LikeModule,
     RedisModule,
-    // LikeModule,
     WebSocketModule,
-    SequelizeModule.forFeature([Post, Comment, User]),
+    SequelizeModule.forFeature([Post, Like, Comment, User]),
   ],
   providers: [PostResolver, PostService, postLoader],
 })

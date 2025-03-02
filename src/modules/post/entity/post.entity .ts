@@ -9,7 +9,9 @@ import {
   CreatedAt,
   UpdatedAt,
   DataType,
+  HasMany,
 } from 'sequelize-typescript'
+import { Like } from 'src/modules/like/entity/like.entity '
 
 @ObjectType()
 @Table
@@ -41,4 +43,7 @@ export class Post extends Model<Post> {
 
   @BelongsTo(() => User)
   user: User
+
+  @HasMany(() => Like)
+  likes: Like[]
 }

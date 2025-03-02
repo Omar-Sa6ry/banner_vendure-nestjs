@@ -11,6 +11,7 @@ import {
   Default,
   HasMany,
 } from 'sequelize-typescript'
+import { Like } from 'src/modules/like/entity/like.entity '
 
 @ObjectType()
 @Table
@@ -75,4 +76,7 @@ export class User extends Model {
 
   @HasMany(() => Post)
   posts: Post[]
+
+  @HasMany(() => Like)
+  likes: Like[]
 }

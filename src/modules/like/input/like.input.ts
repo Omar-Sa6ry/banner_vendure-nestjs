@@ -7,14 +7,10 @@ import { PostInput } from 'src/modules/post/input/Post.input'
 import { User } from 'src/modules/users/entity/user.entity'
 
 @InputType()
-export class CommentInput {
+export class LikeInput {
   @Field()
   @IsInt()
   id: number
-
-  @Field()
-  @IsString()
-  content: string
 
   @Field(() => PostInput)
   post: PostInput
@@ -28,10 +24,10 @@ export class CommentInput {
 }
 
 @InputType()
-export class CommentsInputResponse extends BaseResponse {
-  @Field(() => [CommentInput], { nullable: true })
+export class LikesInputResponse extends BaseResponse {
+  @Field(() => [LikeInput], { nullable: true })
   @Expose()
-  items: CommentInput[]
+  items: LikeInput[]
 
   @IsOptional()
   @Field(() => PaginationInfo, { nullable: true })
@@ -40,8 +36,8 @@ export class CommentsInputResponse extends BaseResponse {
 }
 
 @InputType()
-export class CommentInputResponse extends BaseResponse {
-  @Field(() => CommentInput, { nullable: true })
+export class LikeInputResponse extends BaseResponse {
+  @Field(() => LikeInput, { nullable: true })
   @Expose()
-  data: CommentInput
+  data: LikeInput
 }
