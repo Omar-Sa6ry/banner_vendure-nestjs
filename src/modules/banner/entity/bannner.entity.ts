@@ -1,5 +1,6 @@
 import { Field, Int } from '@nestjs/graphql'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
+import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import {
   Table,
@@ -10,6 +11,7 @@ import {
   CreatedAt,
   UpdatedAt,
   DataType,
+  HasMany,
 } from 'sequelize-typescript'
 
 @Table({
@@ -82,4 +84,7 @@ export class Banner extends Model<Banner> {
 
   @BelongsTo(() => Campaign)
   campaign: Campaign
+
+  @HasMany(() => Interaction)
+  intrtactons: Interaction[]
 }

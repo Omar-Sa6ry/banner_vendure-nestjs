@@ -1,19 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
-import { Op } from 'sequelize'
 import { Partner } from './entity/partner.entity'
 import { Campaign } from '../campaign/entity/campaign.entity'
 import { User } from '../users/entity/user.entity'
-import {
-  partnerInput,
-  PartnerInputResponse,
-  PartnersInputResponse,
-} from './input/partner.input'
 import { I18nService } from 'nestjs-i18n'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { RedisService } from 'src/common/redis/redis.service'
 import { Limit, Page } from 'src/common/constant/messages.constant'
 import { PartnerLoader } from './loader/partner.loader'
+import {
+  partnerInput,
+  PartnerInputResponse,
+  PartnersInputResponse,
+} from './input/partner.input'
 
 @Injectable()
 export class PartnerService {

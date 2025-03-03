@@ -5,6 +5,11 @@ export enum Role {
   MANAGER = 'manager',
 }
 
+export enum InterActionType {
+  VIEW = 'view',
+  CLICK = 'click',
+}
+
 export enum CampaignStatus {
   DRAFT = 'draft',
   PENDING = 'pending',

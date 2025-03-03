@@ -35,7 +35,9 @@ export class BannerResolver {
   }
 
   @Query(() => BannerResponse)
+  @Auth(Role.PARTNER, Role.USER, Role.ADMIN, Role.MANAGER)
   async bannerById (
+    @CurrentUser() user: CurrentUserDto,
     @Args('id', { type: () => Int }) id: number,
   ): Promise<BannerResponse> {
     const bannerCacheKey = `banner:${id}`
@@ -44,11 +46,12 @@ export class BannerResolver {
       return { ...cachedbanner }
     }
 
-    return await this.bannerService.getById(id)
+    return await this.bannerService.getById(id, user.id)
   }
 
   @Query(() => BannersResponse)
   async bannersByCampaign (
+    @CurrentUser() user: CurrentUserDto,
     @Args('campaignId', { type: () => Int }) campaignId: number,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
@@ -59,15 +62,21 @@ export class BannerResolver {
       return { ...cachedbanner }
     }
 
-    return await this.bannerService.getByCampaign(campaignId, page, limit)
+    return await this.bannerService.getByCampaign(
+      user?.id,
+      campaignId,
+      page,
+      limit,
+    )
   }
 
   @Query(() => BannersResponse)
   async getBanners (
+    @CurrentUser() user: CurrentUserDto,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
   ): Promise<BannersResponse> {
-    return await this.bannerService.get(page, limit)
+    return await this.bannerService.get(user.id, page, limit)
   }
 
   @Mutation(() => BannerResponse)

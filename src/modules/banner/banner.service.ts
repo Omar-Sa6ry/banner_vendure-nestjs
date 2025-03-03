@@ -13,7 +13,7 @@ import { CreateBannerDto } from './dtos/CreateBanner.dto'
 import { User } from '../users/entity/user.entity'
 import { I18nService } from 'nestjs-i18n'
 import { CampaignService } from '../campaign/campaign.service'
-import { Role } from 'src/common/constant/enum.constant'
+import { InterActionType, Role } from 'src/common/constant/enum.constant'
 import { RedisService } from 'src/common/redis/redis.service'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { UpdateBannerDto } from './dtos/UpdateBanner.dto'
@@ -24,6 +24,7 @@ import {
   BannerInputResponse,
   BannersInputResponse,
 } from './input/banner.input'
+import { InteractionService } from '../interaction/interaction.service'
 
 @Injectable()
 export class BannerService {
@@ -35,6 +36,7 @@ export class BannerService {
     private readonly i18n: I18nService,
     private readonly bannerLoader: BannerLoader,
     private readonly uploadService: UploadService,
+    private readonly interactionService: InteractionService,
     private readonly campaignService: CampaignService,
     private readonly redisService: RedisService,
     private readonly websocketGateway: WebSocketMessageGateway,
@@ -67,33 +69,49 @@ export class BannerService {
     const image_ar = await this.uploadService.uploadImage(imageAr)
     const image_en = await this.uploadService.uploadImage(imageEn)
 
-    const banner = await this.bannerRepo.create({
-      ...createBannerDto,
-      createdBy: userId,
-      image_ar,
-      image_en,
-    })
+    const transaction = await this.bannerRepo.sequelize.transaction()
 
-    const data: BannerInput = { ...banner, createdBy: user, campaign }
+    try {
+      const banner = await this.bannerRepo.create(
+        {
+          ...createBannerDto,
+          createdBy: userId,
+          image_ar,
+          image_en,
+        },
+        { transaction },
+      )
 
-    const result: BannerInputResponse = {
-      data,
-      statusCode: 201,
-      message: await this.i18n.t('banner.CREATED'),
+      const data: BannerInput = {
+        ...banner,
+        views: 0,
+        clicks: 0,
+        createdBy: user,
+        campaign,
+      }
+
+      const result: BannerInputResponse = {
+        data,
+        statusCode: 201,
+        message: await this.i18n.t('banner.CREATED'),
+      }
+
+      const relationCacheKey = `banner:${banner.id}`
+      await this.redisService.set(relationCacheKey, result)
+
+      this.websocketGateway.broadcast('bannerCreated', {
+        bannerId: banner.id,
+        banner,
+      })
+
+      return result
+    } catch (error) {
+      await transaction.rollback()
+      throw error
     }
-
-    const relationCacheKey = `banner:${banner.id}`
-    await this.redisService.set(relationCacheKey, result)
-
-    this.websocketGateway.broadcast('bannerCreated', {
-      bannerId: banner.id,
-      banner,
-    })
-
-    return result
   }
 
-  async getById (id: number): Promise<BannerInputResponse> {
+  async getById (id: number, userId?: number): Promise<BannerInputResponse> {
     const banner = await this.bannerRepo.findByPk(id)
     if (!banner)
       throw new NotFoundException(await this.i18n.t('banner.NOT_FOUND'))
@@ -110,8 +128,18 @@ export class BannerService {
     if (!campaign)
       throw new NotFoundException(await this.i18n.t('campaign.NOT_FOUND'))
 
+    if (userId) {
+      await this.interactionService.create(userId, {
+        type: InterActionType.CLICK,
+        bannerId: banner.id,
+      })
+    }
+    const views = +(await this.interactionService.countView(banner.id))?.message
+    const clicks = +(await this.interactionService.countClick(banner.id))
+      ?.message
+
     const result: BannerInputResponse = {
-      data: { ...banner, campaign, createdBy: user },
+      data: { ...banner, views, clicks, campaign, createdBy: user },
     }
 
     const relationCacheKey = `banner:${banner.id}`
@@ -121,6 +149,7 @@ export class BannerService {
   }
 
   async getByCampaign (
+    userId: number,
     campaignId: number,
     page: number = Page,
     limit: number = Limit,
@@ -139,7 +168,7 @@ export class BannerService {
       throw new NotFoundException(await this.i18n.t('campaign.NOT_FOUNDS'))
 
     const bannerIds = data.map(banner => banner.id)
-    const banners = await this.bannerLoader.loadMany(bannerIds)
+    const banners = await this.bannerLoader.loadMany(userId, bannerIds)
 
     const items: BannerInput[] = data.map((c, index) => {
       const banner = banners[index]
@@ -162,6 +191,7 @@ export class BannerService {
   }
 
   async get (
+    userId: number,
     page: number = Page,
     limit: number = Limit,
   ): Promise<BannersInputResponse> {
@@ -174,7 +204,7 @@ export class BannerService {
       throw new NotFoundException(await this.i18n.t('campaign.NOT_FOUNDS'))
 
     const bannerIds = data.map(banner => banner.id)
-    const banners = await this.bannerLoader.loadMany(bannerIds)
+    const banners = await this.bannerLoader.loadMany(userId, bannerIds)
 
     const items: BannerInput[] = data.map((c, index) => {
       const banner = banners[index]

@@ -1,0 +1,7 @@
+{
+  "CREATED": "Interaction created successfully",
+  "UPDATED": "Interaction updated successfully",
+  "DELETED": "Interaction deleted successfully",
+  "NOT_FOUND": "Interaction not found",
+  "NOT_FOUNDS": "Interactions not found"
+}

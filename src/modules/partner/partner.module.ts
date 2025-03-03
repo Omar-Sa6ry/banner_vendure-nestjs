@@ -9,12 +9,14 @@ import { PartnerLoader } from './loader/partner.loader'
 import { RedisModule } from 'src/common/redis/redis.module'
 import { UserModule } from '../users/users.module'
 import { WebSocketModule } from 'src/common/websocket/websocket.module'
+import { InteractionModule } from '../interaction/interaction.module'
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Partner, Campaign, User]),
     RedisModule,
     UserModule,
+    InteractionModule,
     WebSocketModule,
   ],
   providers: [PartnerService, PartnerResolver, PartnerLoader],

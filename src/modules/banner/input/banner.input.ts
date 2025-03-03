@@ -14,6 +14,12 @@ export class BannerInput {
   @Field(() => Int)
   page: number
 
+  @Field(() => Int)
+  clicks: number
+
+  @Field(() => Int)
+  views: number
+
   @Field(() => String)
   url_ar: string
 

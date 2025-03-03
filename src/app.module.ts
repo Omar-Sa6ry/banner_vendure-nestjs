@@ -14,6 +14,7 @@ import { LikeModule } from './modules/like/like.module'
 import { CampaignModule } from './modules/campaign/campaign.module'
 import { PartnerModule } from './modules/partner/partner.module'
 import { BannerModule } from './modules/banner/banner.module'
+import { InteractionModule } from './modules/interaction/interaction.module'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BannerModule } from './modules/banner/banner.module'
     CampaignModule,
     PartnerModule,
     BannerModule,
+    InteractionModule,
     PostModule,
     CommentModule,
     LikeModule,

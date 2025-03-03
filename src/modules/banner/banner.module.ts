@@ -12,11 +12,14 @@ import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { BannerLoader } from './loader/banner.loader'
 import { UploadModule } from 'src/common/upload/upload.module'
 import { CampaignModule } from '../campaign/campaign.module'
+import { InteractionModule } from '../interaction/interaction.module'
+import { Interaction } from '../interaction/entity/interaction.entity'
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Banner, Partner, User, Campaign]),
+    SequelizeModule.forFeature([Banner, Interaction, Partner, User, Campaign]),
     UserModule,
+    InteractionModule,
     UploadModule,
     CampaignModule,
     RedisModule,
