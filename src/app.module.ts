@@ -13,6 +13,7 @@ import { CommentModule } from './modules/comment/comment.module'
 import { LikeModule } from './modules/like/like.module'
 import { CampaignModule } from './modules/campaign/campaign.module'
 import { PartnerModule } from './modules/partner/partner.module'
+import { BannerModule } from './modules/banner/banner.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PartnerModule } from './modules/partner/partner.module'
     UserModule,
     CampaignModule,
     PartnerModule,
+    BannerModule,
     PostModule,
     CommentModule,
     LikeModule,

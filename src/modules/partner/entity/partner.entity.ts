@@ -8,7 +8,9 @@ import {
   BelongsTo,
   CreatedAt,
   DataType,
+  HasMany,
 } from 'sequelize-typescript'
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
 @Table({
   tableName: 'campaign_sponsors',
@@ -34,4 +36,7 @@ export class Partner extends Model<Partner> {
 
   @BelongsTo(() => User)
   user: User
+
+  @HasMany(() => Banner)
+  banners: Banner[]
 }

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { Campaign } from './entity/campaign.entity'
 import { CreateCampaignCDto } from './dtos/CreateCampaign.dto'
@@ -11,7 +7,6 @@ import {
   CampaignInputResponse,
   CampaignsInputResponse,
 } from './input/campain.input'
-import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { User } from '../users/entity/user.entity'
 import { RedisService } from 'src/common/redis/redis.service'
 import { CampaignDto } from './dtos/Campaign.dto'
@@ -54,7 +49,7 @@ export class CampaignService {
       const relationCacheKey = `campaign:${campaign.id}`
       await this.redisService.set(relationCacheKey, campaign)
 
-      await this.websocketGateway.broadcast('campaignCreated', {
+      this.websocketGateway.broadcast('campaignCreated', {
         campaignId: campaign.id,
         campaign,
       })

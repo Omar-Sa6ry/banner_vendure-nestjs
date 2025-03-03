@@ -1,4 +1,5 @@
 {
   "CREATED": "User created successfully",
-  "NOT_FOUND": "User not found"
+  "NOT_FOUND": "User not found",
+  "ROLE": "you arenot partner"
 }

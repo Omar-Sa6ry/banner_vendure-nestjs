@@ -14,6 +14,7 @@ import {
   HasMany,
 } from 'sequelize-typescript'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
 @ObjectType()
 @Table({
@@ -77,6 +78,9 @@ export class Campaign extends Model<Campaign> {
   @BelongsTo(() => User)
   @Field(() => User)
   user: User
+
+  @HasMany(() => Banner)
+  banners: Banner[]
 
   @HasMany(() => Partner)
   partners: Partner[]
