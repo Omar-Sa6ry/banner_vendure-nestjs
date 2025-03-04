@@ -3,6 +3,7 @@ import { Expose } from 'class-transformer'
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 
@@ -16,9 +17,8 @@ export class PostInput {
   @IsString()
   content: string
 
-  @Field()
-  @IsString()
-  imageUrl: string
+  @Field(() => Banner)
+  banner: Banner
 
   @Field(() => User)
   user: User

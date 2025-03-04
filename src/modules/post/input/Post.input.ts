@@ -4,6 +4,7 @@ import { User } from 'src/modules/users/entity/user.entity'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
 @InputType()
 export class PostInput {
@@ -15,9 +16,8 @@ export class PostInput {
   @IsString()
   content: string
 
-  @Field()
-  @IsString()
-  imageUrl: string
+  @Field(() => Banner)
+  banner: Banner
 
   @Field(() => User, { nullable: true })
   user: User

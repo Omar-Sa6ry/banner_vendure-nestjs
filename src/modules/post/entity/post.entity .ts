@@ -12,6 +12,7 @@ import {
   HasMany,
 } from 'sequelize-typescript'
 import { Like } from 'src/modules/like/entity/like.entity '
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
 @ObjectType()
 @Table({ timestamps: true })
@@ -22,11 +23,12 @@ export class Post extends Model<Post> {
 
   @Field(() => String)
   @Column({ type: DataType.STRING })
-  imageUrl: string
-
-  @Field(() => String)
-  @Column({ type: DataType.STRING })
   content: string
+
+  @Field(() => Int)
+  @ForeignKey(() => Banner)
+  @Column({ type: DataType.INTEGER })
+  bannerId: number
 
   @Field(() => Int)
   @ForeignKey(() => User)
@@ -43,6 +45,9 @@ export class Post extends Model<Post> {
 
   @BelongsTo(() => User)
   user: User
+
+  @BelongsTo(() => Banner)
+  banner: Banner
 
   @HasMany(() => Like)
   likes: Like[]

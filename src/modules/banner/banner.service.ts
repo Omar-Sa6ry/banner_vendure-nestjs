@@ -9,6 +9,7 @@ import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Banner } from './entity/bannner.entity'
 import { CreateImagDto } from 'src/common/upload/dtos/createImage.dto'
+import { InteractionService } from '../interaction/interaction.service'
 import { CreateBannerDto } from './dtos/CreateBanner.dto'
 import { User } from '../users/entity/user.entity'
 import { I18nService } from 'nestjs-i18n'
@@ -24,7 +25,6 @@ import {
   BannerInputResponse,
   BannersInputResponse,
 } from './input/banner.input'
-import { InteractionService } from '../interaction/interaction.service'
 
 @Injectable()
 export class BannerService {
@@ -160,7 +160,7 @@ export class BannerService {
 
     const { rows: data, count: total } = await this.bannerRepo.findAndCountAll({
       where: { campaignId },
-      order: [['createdAt', 'DESC']],
+      order: [['score', 'DESC']],
       offset: (page - 1) * limit,
       limit,
     })
@@ -196,7 +196,7 @@ export class BannerService {
     limit: number = Limit,
   ): Promise<BannersInputResponse> {
     const { rows: data, count: total } = await this.bannerRepo.findAndCountAll({
-      order: [['createdAt', 'DESC']],
+      order: [['score', 'DESC']],
       offset: (page - 1) * limit,
       limit,
     })

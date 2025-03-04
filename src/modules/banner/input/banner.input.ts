@@ -37,7 +37,7 @@ export class BannerInput {
   redirect?: string
 
   @Field(() => Boolean)
-  is_active: boolean
+  isActive: boolean
 
   @Field(() => Date)
   createdAt: Date

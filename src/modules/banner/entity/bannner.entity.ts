@@ -1,5 +1,6 @@
 import { Field, Int } from '@nestjs/graphql'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
+import { Post } from 'src/modules/post/entity/post.entity '
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import {
@@ -13,6 +14,7 @@ import {
   DataType,
   HasMany,
 } from 'sequelize-typescript'
+import { InjectModel } from '@nestjs/sequelize'
 
 @Table({
   tableName: 'banners',
@@ -69,7 +71,19 @@ export class Banner extends Model<Banner> {
 
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   @Field(() => Boolean)
-  is_active: boolean
+  isActive: boolean
+
+  @Column({
+    type: DataType.VIRTUAL,
+    get (this: Banner): number {
+      if (!this.interactions) return 0
+      const clicks = this.interactions.filter(i => i.type === 'click').length
+      const views = this.interactions.filter(i => i.type === 'view').length
+      return clicks / views
+    },
+  })
+  @Field(() => Int)
+  score: number
 
   @CreatedAt
   @Field(() => Date)
@@ -86,5 +100,8 @@ export class Banner extends Model<Banner> {
   campaign: Campaign
 
   @HasMany(() => Interaction)
-  intrtactons: Interaction[]
+  interactions: Interaction[]
+
+  @HasMany(() => Post)
+  postas: Post[]
 }

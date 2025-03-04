@@ -23,5 +23,5 @@ export class CreateBannerDto {
   redirect?: string
 
   @IsBoolean()
-  is_active: boolean
+  isActive: boolean
 }

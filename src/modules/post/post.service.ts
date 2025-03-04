@@ -21,6 +21,7 @@ import {
   PostInputResponse,
   PostsInputResponse,
 } from './input/Post.input'
+import { Banner } from '../banner/entity/bannner.entity'
 
 @Injectable()
 export class PostService {
@@ -34,29 +35,32 @@ export class PostService {
     private readonly websocketGateway: WebSocketMessageGateway,
     @InjectModel(Post) private postRepo: typeof Post,
     @InjectModel(User) private userRepo: typeof User,
+    @InjectModel(Banner) private bannerRepo: typeof Banner,
     @InjectModel(Comment) private commentRepo: typeof Comment,
   ) {}
 
   async create (
     userId: number,
+    bannerId: number,
     content: string,
-    createImageDto: CreateImagDto,
   ): Promise<PostInputResponse> {
     const user = await this.userRepo.findOne({ where: { id: userId } })
     if (!user) {
       throw new BadRequestException(await this.i18n.t('user.NOT_FOUND'))
     }
 
+    const banner = await this.bannerRepo.findByPk(bannerId)
+    if (!banner)
+      throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))
+
     const transaction = await this.postRepo.sequelize.transaction()
 
     try {
       const post = await this.postRepo.create(
-        { content, userId },
+        { content, userId, bannerId },
         { transaction },
       )
 
-      const image = await this.uploadService.uploadImage(createImageDto)
-      post.imageUrl = image
       await post.save({ transaction })
 
       const data: PostInput = {
@@ -65,7 +69,7 @@ export class PostService {
         user,
         likes: 0,
         comments: [],
-        imageUrl: image,
+        banner,
         createdAt: post.createdAt,
       }
 
@@ -114,14 +118,16 @@ export class PostService {
 
     const likes = +(await this.likeService.numPostLikes(post.id)).message
 
+    const banner = await this.bannerRepo.findByPk(post.bannerId)
+    if (!banner)
+      throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))
+
     const data: PostInput = {
-      id: post.id,
-      content: post.content,
-      imageUrl: post.imageUrl,
+      ...post,
       user,
       comments,
       likes,
-      createdAt: post.createdAt,
+      banner,
     }
 
     const relationCacheKey = `posts:${id}`
@@ -244,18 +250,14 @@ export class PostService {
       })
 
       const likes = +(await this.likeService.numPostLikes(post.id)).message
+     
+      const banner = await this.bannerRepo.findByPk(post.bannerId)
+      if (!banner)
+        throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))
 
       const result: PostInputResponse = {
         message: await this.i18n.t('post.UPDATED'),
-        data: {
-          id: post.id,
-          content: post.content,
-          user,
-          comments,
-          likes,
-          imageUrl: post.imageUrl,
-          createdAt: post.createdAt,
-        },
+        data: { ...post, user, comments, likes },
       }
 
       const relationCacheKey = `post:${post.id}`
@@ -287,7 +289,6 @@ export class PostService {
       }
 
       await post.destroy({ transaction })
-      await this.uploadService.deleteImage(post.imageUrl)
 
       this.websocketGateway.broadcast('postDeleted', {
         postId: id,

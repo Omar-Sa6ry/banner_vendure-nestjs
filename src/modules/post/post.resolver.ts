@@ -7,7 +7,6 @@ import { CurrentUser } from 'src/common/decerator/currentUser.decerator'
 import { CurrentUserDto } from 'src/common/dtos/currentUser.dto'
 import { RedisService } from 'src/common/redis/redis.service'
 import { PostResponse, PostsResponse } from './dto/PostResponse.dto'
-import { CreateImagDto } from 'src/common/upload/dtos/createImage.dto'
 import { PostInputResponse } from './input/Post.input'
 
 @Resolver(() => Post)
@@ -22,9 +21,9 @@ export class PostResolver {
   async createPost (
     @CurrentUser() user: CurrentUserDto,
     @Args('content', { type: () => String }) content: string,
-    @Args('image', { type: () => CreateImagDto }) image: CreateImagDto,
+    @Args('bannerId', { type: () => Int }) bannerId: number,
   ): Promise<PostResponse> {
-    return await this.postService.create(user.id, content, image)
+    return await this.postService.create(user.id, bannerId, content)
   }
 
   @Query(() => PostResponse)

@@ -10,6 +10,7 @@ import {
   BelongsTo,
   CreatedAt,
   DataType,
+  BeforeCreate,
 } from 'sequelize-typescript'
 
 @ObjectType()
@@ -53,4 +54,20 @@ export class Interaction extends Model<Interaction> {
 
   @BelongsTo(() => Banner)
   banner: Banner
+
+  @BeforeCreate
+  static async updateBannerScore (instance: Interaction) {
+    if (instance.bannerId) {
+      const banner = await Banner.findByPk(instance.bannerId, {
+        include: [Interaction],
+      })
+      if (banner) {
+        const clicks =
+          banner.interactions?.filter(i => i.type === 'click').length || 0
+        const views =
+          banner.interactions?.filter(i => i.type === 'view').length || 1
+        await banner.update({ score: clicks / views })
+      }
+    }
+  }
 }

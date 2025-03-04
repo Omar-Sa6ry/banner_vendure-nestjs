@@ -12,15 +12,16 @@ import { postLoader } from './loader/post.loader'
 import { Comment } from '../comment/entity/comment.entity '
 import { LikeModule } from '../like/like.module'
 import { Like } from '../like/entity/like.entity '
+import { Banner } from '../banner/entity/bannner.entity'
 
 @Module({
   imports: [
+    SequelizeModule.forFeature([Post, Banner, Like, Comment, User]),
     UserModule,
     UploadModule,
     LikeModule,
     RedisModule,
     WebSocketModule,
-    SequelizeModule.forFeature([Post, Like, Comment, User]),
   ],
   providers: [PostResolver, PostService, postLoader],
 })

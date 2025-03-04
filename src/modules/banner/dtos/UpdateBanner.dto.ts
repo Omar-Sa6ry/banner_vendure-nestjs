@@ -25,5 +25,5 @@ export class UpdateBannerDto {
 
   @IsOptional()
   @IsBoolean()
-  is_active?: boolean
+  isActive?: boolean
 }
