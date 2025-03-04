@@ -10,12 +10,14 @@ import { SequelizeModule } from '@nestjs/sequelize'
 import { RedisModule } from 'src/common/redis/redis.module'
 import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { LikeLoader } from './loader/like.loader'
+import { NotificationModule } from 'src/common/queues/notification/notification.module'
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Post, Comment, User, Like]),
     UserModule,
     RedisModule,
+    NotificationModule,
     WebSocketModule,
   ],
   providers: [LikeResolver, LikeService, LikeLoader],

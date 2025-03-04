@@ -3,12 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { UserService } from '../users/users.service'
 import { User } from '../users/entity/user.entity'
 import { Follow } from './entity/follow.entity'
 import { InjectModel } from '@nestjs/sequelize'
 import { I18nService } from 'nestjs-i18n'
 import { RedisService } from 'src/common/redis/redis.service'
+import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { Status, UserStatus } from 'src/common/constant/enum.constant'
 import { Limit, Page } from 'src/common/constant/messages.constant'
@@ -26,6 +26,7 @@ export class FollowService {
     private readonly followLoader: FollowLoader,
     private readonly redisService: RedisService,
     private readonly websocketGateway: WebSocketMessageGateway,
+    private readonly notificationService: NotificationService,
     @InjectModel(Follow) private followRepo: typeof Follow,
     @InjectModel(User) private userRepo: typeof User,
   ) {}
@@ -80,6 +81,12 @@ export class FollowService {
         followId: follow.id,
         follow,
       })
+
+      this.notificationService.sendNotification(
+        following.fcmToken,
+        await this.i18n.t('comment.CREATED'),
+        `${follower.userName} follow you`,
+      )
 
       return result
     }
@@ -334,6 +341,12 @@ export class FollowService {
         follow.save()
         isFriend.save()
       }
+
+      this.notificationService.sendNotification(
+        follower.fcmToken,
+        await this.i18n.t('comment.CREATED'),
+        `${following.userName} accept you`,
+      )
 
       return {
         message: await this.i18n.t('follow.ACCEPT'),

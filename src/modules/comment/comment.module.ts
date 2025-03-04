@@ -11,6 +11,7 @@ import { CommentLoader } from './loader/comment.loader'
 import { RedisModule } from 'src/common/redis/redis.module'
 import { LikeModule } from '../like/like.module'
 import { Like } from '../like/entity/like.entity '
+import { NotificationModule } from 'src/common/queues/notification/notification.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Like } from '../like/entity/like.entity '
     WebSocketModule,
     RedisModule,
     LikeModule,
+    NotificationModule,
     SequelizeModule.forFeature([Post, User, Like, Comment]),
   ],
   providers: [CommentResolver, CommentService, CommentLoader],

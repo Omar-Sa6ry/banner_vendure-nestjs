@@ -1,11 +1,10 @@
-import { LikeService } from './../like/like.service'
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
+import { LikeService } from './../like/like.service'
 import { Post } from './entity/post.entity '
-import { UploadService } from '../../common/upload/upload.service'
 import { User } from '../users/entity/user.entity'
 import { RedisService } from 'src/common/redis/redis.service'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
@@ -247,7 +246,7 @@ export class PostService {
       })
 
       const likes = +(await this.likeService.numPostLikes(post.id)).message
-     
+
       const banner = await this.bannerRepo.findByPk(post.bannerId)
       if (!banner)
         throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))

@@ -8,6 +8,7 @@ import { Follow } from './entity/follow.entity'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { FollowLoader } from './loader/follow.loader'
+import { NotificationModule } from 'src/common/queues/notification/notification.module'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FollowLoader } from './loader/follow.loader'
     RedisModule,
     UserModule,
     WebSocketModule,
+    NotificationModule,
   ],
   providers: [FollowResolver, FollowService, FollowLoader],
 })

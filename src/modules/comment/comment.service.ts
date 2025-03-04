@@ -8,6 +8,8 @@ import { User } from '../users/entity/user.entity'
 import { Post } from '../post/entity/post.entity '
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { InjectModel } from '@nestjs/sequelize'
+import { LikeService } from '../like/like.service'
+import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { I18nService } from 'nestjs-i18n'
 import { RedisService } from 'src/common/redis/redis.service'
 import { Limit, Page } from 'src/common/constant/messages.constant'
@@ -17,8 +19,6 @@ import {
   CommentInputResponse,
   CommentsInputResponse,
 } from './input/comment.input'
-import { LikeService } from '../like/like.service'
-import { PostInput } from '../post/input/Post.input'
 
 @Injectable()
 export class CommentService {
@@ -31,6 +31,7 @@ export class CommentService {
     private readonly likeService: LikeService,
     private readonly redisService: RedisService,
     private readonly websocketGateway: WebSocketMessageGateway,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async write (
@@ -68,6 +69,8 @@ export class CommentService {
       const likes = +(await this.likeService.numPostLikes(post.id)).message
       await transaction.commit()
 
+      const userPost = await this.userRepo.findByPk(post.userId)
+
       const data: CommentInput = {
         id: comment.id,
         createdAt: comment.createdAt,
@@ -75,6 +78,7 @@ export class CommentService {
         content,
         post: {
           ...post,
+          user: userPost,
           comments,
           likes,
         },
@@ -87,6 +91,12 @@ export class CommentService {
 
       const relationCacheKey = `comment:${comment.id}`
       await this.redisService.set(relationCacheKey, data)
+
+      this.notificationService.sendNotification(
+        userPost.fcmToken,
+        await this.i18n.t('comment.CREATED'),
+        `${user.userName} write a comment`,
+      )
 
       return {
         data,
@@ -375,16 +385,23 @@ export class CommentService {
     })
     const likes = +(await this.likeService.numPostLikes(post.id)).message
 
+    const userPost = await this.userRepo.findByPk(post.userId)
+
     const data: CommentInput = {
       id: comment.id,
       content: comment.content,
-      post: { ...post, likes, comments },
+      post: { ...post, user: userPost, likes, comments },
       user,
       createdAt: comment.createdAt,
     }
     const relationCacheKey = `comment:${post.id}`
     await this.redisService.set(relationCacheKey, data)
 
+    this.notificationService.sendNotification(
+      userPost.fcmToken,
+      await this.i18n.t('comment.UPDATED'),
+      `${user.userName} update a comment`,
+    )
     return { message: await this.i18n.t('comment.UPDATED'), data }
   }
 
@@ -413,6 +430,15 @@ export class CommentService {
       comment: comment.id,
       userId,
     })
+
+    const post = await this.postRepo.findByPk(comment.postId)
+    const userPost = await this.userRepo.findByPk(post.userId)
+
+    this.notificationService.sendNotification(
+      userPost.fcmToken,
+      await this.i18n.t('comment.DELETED'),
+      `${user.userName} update a comment`,
+    )
 
     return { message: await this.i18n.t('comment.DELETED'), data: null }
   }

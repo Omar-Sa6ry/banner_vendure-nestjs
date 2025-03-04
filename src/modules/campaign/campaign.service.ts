@@ -1,27 +1,31 @@
+import { NotificationLoader } from './../../common/queues/notification/loader/notification.loader'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { Campaign } from './entity/campaign.entity'
 import { CreateCampaignCDto } from './dtos/CreateCampaign.dto'
+import { User } from '../users/entity/user.entity'
+import { RedisService } from 'src/common/redis/redis.service'
+import { CampaignDto } from './dtos/Campaign.dto'
+import { Partner } from '../partner/entity/partner.entity'
+import { CampaignLoader } from './loader/campaign.loader'
+import { InjectModel } from '@nestjs/sequelize'
+import { I18nService } from 'nestjs-i18n'
+import { Limit, Page } from 'src/common/constant/messages.constant'
 import {
   CampaignInput,
   CampaignInputResponse,
   CampaignsInputResponse,
 } from './input/campain.input'
-import { User } from '../users/entity/user.entity'
-import { RedisService } from 'src/common/redis/redis.service'
-import { CampaignDto } from './dtos/Campaign.dto'
-import { CampaignLoader } from './loader/campaign.loader'
-import { InjectModel } from '@nestjs/sequelize'
-import { I18nService } from 'nestjs-i18n'
-import { Limit, Page } from 'src/common/constant/messages.constant'
 
 @Injectable()
 export class CampaignService {
   constructor (
     @InjectModel(Campaign) private campaignRepo: typeof Campaign,
+    @InjectModel(Partner) private partnerRepo: typeof Partner,
     @InjectModel(User) private userRepo: typeof User,
     private readonly i18n: I18nService,
     private readonly campaignLoader: CampaignLoader,
+    private readonly notificationLoader: NotificationLoader,
     private readonly redisService: RedisService,
     private readonly websocketGateway: WebSocketMessageGateway,
   ) {}
@@ -180,6 +184,19 @@ export class CampaignService {
     const relationCacheKey = `campaign:${campaign.id}`
     await this.redisService.set(relationCacheKey, result)
 
+    const partners = await this.partnerRepo.findAll({
+      where: { campaignId: campaign.id },
+    })
+
+    if (partners.length !== 0) {
+      const partnerUserIds = partners.map(partner => partner.userId)
+      this.notificationLoader.sendNotifications(
+        partnerUserIds,
+        campaign.name,
+        await this.i18n.t('campaign.NOT_FOUND'),
+      )
+    }
+
     return {
       message: await this.i18n.t('campaign.UPDATED'),
       data: { user: campaign.user, ...campaign },
@@ -196,6 +213,19 @@ export class CampaignService {
     this.websocketGateway.broadcast('campaignDeleted', {
       campaignId: id,
     })
+
+    const partners = await this.partnerRepo.findAll({
+      where: { campaignId: campaign.id },
+    })
+
+    if (partners.length !== 0) {
+      const partnerUserIds = partners.map(partner => partner.userId)
+      this.notificationLoader.sendNotifications(
+        partnerUserIds,
+        campaign.name,
+        await this.i18n.t('campaign.NOT_FOUND'),
+      )
+    }
 
     return { data: null, message: await this.i18n.t('campaign.DELETED') }
   }

@@ -7,6 +7,7 @@ import { Like } from './entity/like.entity '
 import { Post } from '../post/entity/post.entity '
 import { User } from '../users/entity/user.entity'
 import { Comment } from '../comment/entity/comment.entity '
+import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { InjectModel } from '@nestjs/sequelize'
 import { I18nService } from 'nestjs-i18n'
 import { RedisService } from 'src/common/redis/redis.service'
@@ -30,6 +31,7 @@ export class LikeService {
     private readonly redisService: RedisService,
     private readonly likeLoader: LikeLoader,
     private readonly websocketGateway: WebSocketMessageGateway,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async likePost (userId: number, id: number): Promise<LikeInputResponse> {
@@ -62,7 +64,7 @@ export class LikeService {
         order: [['createdAt', 'DESC']],
       })
 
-      const postUser = await this.userRepo.findOne({
+      const userPost = await this.userRepo.findOne({
         where: { id: post.userId },
       })
       if (!user)
@@ -74,7 +76,7 @@ export class LikeService {
         id: like.id,
         createdAt: like.createdAt,
         user,
-        post: { ...post, likes, user: postUser, comments: postComments },
+        post: { ...post, likes, user: userPost, comments: postComments },
       }
 
       const relationCacheKey = `like:${like.id}`
@@ -86,6 +88,13 @@ export class LikeService {
       })
 
       await transaction.commit()
+
+      this.notificationService.sendNotification(
+        userPost.fcmToken,
+        await this.i18n.t('comment.CREATED'),
+        `${user.userName} write a comment`,
+      )
+
       return {
         data,
         statusCode: 201,
