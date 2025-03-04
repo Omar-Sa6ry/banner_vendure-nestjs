@@ -25,14 +25,9 @@ export class AuthResolver {
   async register (
     @Args('fcmToken') fcmToken: string,
     @Args('createUserDto') createUserDto: CreateUserDto,
-    // @Args('avatar', { nullable: true }) avatar?: CreateImagDto,
+    @Args('avatar', { nullable: true }) avatar?: CreateImagDto,
   ): Promise<AuthResponse> {
-    console.log('nferuhbu')
-    return {
-      statusCode: 201,
-      message: 'you signup successfully',
-      data: await this.authService.register(fcmToken, createUserDto),
-    }
+    return await this.authService.register(fcmToken, createUserDto, avatar)
   }
 
   @Mutation(returns => AuthResponse)
@@ -40,14 +35,14 @@ export class AuthResolver {
     @Args('fcmToken') fcmToken: string,
     @Args('loginDto') loginDto: LoginDto,
   ): Promise<AuthResponse> {
-    const userCacheKey = `user:${loginDto.email}`
+    const userCacheKey = `auth:${loginDto.email}`
     const cachedUser = await this.redisService.get(userCacheKey)
 
-    if (cachedUser instanceof AuthOutPut) {
-      return { data: cachedUser }
+    if (cachedUser instanceof AuthResponse) {
+      return { ...cachedUser }
     }
 
-    return { data: await this.authService.login(fcmToken, loginDto) }
+    return await this.authService.login(fcmToken, loginDto)
   }
 
   @Mutation(returns => String)
@@ -76,14 +71,29 @@ export class AuthResolver {
     @Args('fcmToken') fcmToken: string,
     @Args('loginDto') loginDto: LoginDto,
   ): Promise<AuthResponse> {
-    const userCacheKey = `user:${loginDto.email}`
+    const userCacheKey = `auth:${loginDto.email}`
     const cachedUser = await this.redisService.get(userCacheKey)
 
-    if (cachedUser instanceof AuthOutPut) {
-      return { data: cachedUser }
+    if (cachedUser instanceof AuthResponse) {
+      return { ...cachedUser }
     }
 
-    return { data: await this.authService.adminLogin(loginDto) }
+    return await this.authService.adminLogin(fcmToken, loginDto)
+  }
+
+  @Mutation(returns => AuthResponse)
+  async partnerLogin (
+    @Args('fcmToken') fcmToken: string,
+    @Args('loginDto') loginDto: LoginDto,
+  ): Promise<AuthResponse> {
+    const userCacheKey = `auth:${loginDto.email}`
+    const cachedUser = await this.redisService.get(userCacheKey)
+
+    if (cachedUser instanceof AuthResponse) {
+      return { ...cachedUser }
+    }
+
+    return await this.authService.partnerLogin(fcmToken, loginDto)
   }
 
   @Mutation(returns => AuthResponse)
@@ -91,14 +101,14 @@ export class AuthResolver {
     @Args('fcmToken') fcmToken: string,
     @Args('loginDto') loginDto: LoginDto,
   ): Promise<AuthResponse> {
-    const userCacheKey = `user:${loginDto.email}`
+    const userCacheKey = `auth:${loginDto.email}`
     const cachedUser = await this.redisService.get(userCacheKey)
 
-    if (cachedUser instanceof AuthOutPut) {
-      return { data: cachedUser }
+    if (cachedUser instanceof AuthResponse) {
+      return { ...cachedUser }
     }
 
-    return { data: await this.authService.managerLogin(loginDto) }
+    return await this.authService.managerLogin(fcmToken, loginDto)
   }
 
   @Mutation(() => Boolean)

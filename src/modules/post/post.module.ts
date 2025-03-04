@@ -4,7 +4,6 @@ import { PostService } from './post.service'
 import { UserModule } from '../users/users.module'
 import { RedisModule } from 'src/common/redis/redis.module'
 import { Post } from './entity/post.entity '
-import { UploadModule } from '../../common/upload/upload.module'
 import { User } from '../users/entity/user.entity'
 import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { SequelizeModule } from '@nestjs/sequelize'
@@ -18,7 +17,6 @@ import { Banner } from '../banner/entity/bannner.entity'
   imports: [
     SequelizeModule.forFeature([Post, Banner, Like, Comment, User]),
     UserModule,
-    UploadModule,
     LikeModule,
     RedisModule,
     WebSocketModule,

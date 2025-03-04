@@ -1,135 +1,132 @@
-import {
-  EmailIsWrong,
-  EmailUsed,
-  UserNameUsed,
-} from 'src/common/constant/messages.constant'
 import { User } from './entity/user.entity'
 import { UpdateUserDto } from './dtos/UpdateUser.dto'
 import { RedisService } from 'src/common/redis/redis.service'
+import { UploadService } from '../../common/upload/upload.service'
+import { InjectModel } from '@nestjs/sequelize'
+import { I18nService } from 'nestjs-i18n'
+import { Role } from 'src/common/constant/enum.constant'
+import { UserInputResponse } from './input/User.input'
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { UploadService } from '../../common/upload/upload.service'
-import { InjectModel } from '@nestjs/sequelize'
 
 @Injectable()
 export class UserService {
   constructor (
+    private readonly i18n: I18nService,
     private uploadService: UploadService,
     private readonly redisService: RedisService,
-    @InjectModel(User) private userRepo: typeof User,  ) {}
+    @InjectModel(User) private userRepo: typeof User,
+  ) {}
 
-  async findById (id: number) {
+  async findById (id: number): Promise<UserInputResponse> {
     const user = await this.userRepo.findOne({ where: { id } })
     if (!user) {
-      throw new NotFoundException(`User with this ${id} not found`)
+      throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
     }
 
     const userCacheKey = `user:${user.id}`
     await this.redisService.set(userCacheKey, user)
 
-    return user
+    return { data: user }
   }
 
-  async findByUserName (userName: string) {
+  async findByUserName (userName: string): Promise<UserInputResponse> {
     const user = await this.userRepo.findOne({ where: { userName } })
     if (!user) {
-      throw new NotFoundException(`User with ${userName} not found`)
+      throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
     }
     const userCacheKey = `user:${user.userName}`
     await this.redisService.set(userCacheKey, user)
-    return user
+    return { data: user }
   }
 
-  async findByEmail (email: string) {
+  async findByEmail (email: string): Promise<UserInputResponse> {
     const user = await this.userRepo.findOne({ where: { email } })
     if (!user) {
-      throw new NotFoundException(`User with ${email} not found`)
+      throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
     }
     const userCacheKey = `user:${user.email}`
     await this.redisService.set(userCacheKey, user)
-    return user
+    return { data: user }
   }
 
-async updateUser(updateUserDto: UpdateUserDto, id: number) {
-  const transaction = await this.userRepo.sequelize.transaction();
+  async update (
+    updateUserDto: UpdateUserDto,
+    id: number,
+  ): Promise<UserInputResponse> {
+    const transaction = await this.userRepo.sequelize.transaction()
 
-  try {
-    const user = await this.userRepo.findOne({ where: { id }, transaction });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found.`);
-    }
-
-    if (updateUserDto.email && updateUserDto.email !== user.email) {
-      const existingUser = await this.userRepo.findOne({
-        where: { email: updateUserDto.email },
-        transaction,
-      });
-      if (existingUser) {
-        throw new BadRequestException(EmailUsed);
+    try {
+      const user = await this.userRepo.findOne({ where: { id }, transaction })
+      if (!user) {
+        throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
       }
-    }
 
-    if (updateUserDto.userName && updateUserDto.userName !== user.userName) {
-      const existingUser = await this.userRepo.findOne({
-        where: { userName: updateUserDto.userName },
-        transaction,
-      });
-      if (existingUser) {
-        throw new BadRequestException(UserNameUsed);
+      if (updateUserDto.email && updateUserDto.email !== user.email) {
+        const existingUser = await this.userRepo.findOne({
+          where: { email: updateUserDto.email },
+          transaction,
+        })
+        if (existingUser)
+          throw new BadRequestException(await this.i18n.t('user.EMAIL_USED'))
       }
-    }
 
-    Object.assign(user, updateUserDto);
-
-    if (updateUserDto.avatar) {
-      const oldPath = user.avatar;
-      const filename = await this.uploadService.uploadImage(updateUserDto.avatar);
-      if (typeof filename === 'string') {
-        user.avatar = filename;
-
-        // ✅ Optional: Delete old avatar (outside transaction for safety)
-        // await this.uploadService.deleteImageByPath(oldPath);
+      if (updateUserDto.userName && updateUserDto.userName !== user.userName) {
+        const existingUser = await this.userRepo.findOne({
+          where: { userName: updateUserDto.userName },
+          transaction,
+        })
+        if (existingUser)
+          throw new BadRequestException(await this.i18n.t('user.USERNAME_USED'))
       }
+
+      Object.assign(user, updateUserDto)
+
+      if (updateUserDto.avatar) {
+        const oldPath = user.avatar
+        const filename = await this.uploadService.uploadImage(
+          updateUserDto.avatar,
+        )
+        if (typeof filename === 'string') {
+          user.avatar = filename
+
+          await this.uploadService.deleteImage(oldPath)
+        }
+      }
+
+      await user.save({ transaction })
+
+      const userCacheKey = `user:${user.email}`
+      await this.redisService.set(userCacheKey, user)
+
+      await transaction.commit()
+      return { data: user }
+    } catch (error) {
+      await transaction.rollback()
+      throw error
     }
-
-    // ✅ Save updated user inside the transaction
-    await user.save({ transaction });
-
-    // ✅ Update Redis cache
-    const userCacheKey = `user:${user.email}`;
-    await this.redisService.set(userCacheKey, user);
-
-    await transaction.commit();
-    return user;
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
   }
-}
 
+  async deleteUser (id: number): Promise<UserInputResponse> {
+    const user = await this.findById(id)
+    if (!(user instanceof User))
+      throw new BadRequestException(await this.i18n.t('user.EMAIL_WRONG'))
 
-  // async deleteUser (id: number) {
-  //   const user = await this.findById(id)
-  //   if (!(user instanceof User)) {
-  //     throw new NotFoundException(EmailIsWrong)
-  //   }
+    await this.uploadService.deleteImage(user.avatar)
+    await user.destroy()
+    return await this.i18n.t('user.DELETED')
+  }
 
-  //   // await this.uploadService.deleteImageByPath(user.avatar)
-  //   await this.userRepo.remove(user)
-  //   return `User with email : ${id} deleted Successfully`
-  // }
+  async editUserRole (email: string): Promise<UserInputResponse> {
+    const user = await this.findByEmail(email)
+    if (!(user instanceof User))
+      throw new BadRequestException(await this.i18n.t('user.EMAIL_WRONG'))
 
-  // async editUserRole (email: string) {
-  //   const user = await this.findByEmail(email)
-  //   if (!(user instanceof User)) {
-  //     throw new NotFoundException(EmailIsWrong)
-  //   }
-
-  //   user.role = Role.ADMIN
-  //   await this.userRepo.save(user)
-  //   return `User with email : ${user.email} updated Successfully`
-  // }
+    user.role = Role.ADMIN
+    await user.save()
+    return { data: user, message: await this.i18n.t('user.UPDATED') }
+  }
 }

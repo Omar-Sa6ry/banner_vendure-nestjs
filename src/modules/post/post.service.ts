@@ -9,9 +9,9 @@ import { UploadService } from '../../common/upload/upload.service'
 import { User } from '../users/entity/user.entity'
 import { RedisService } from 'src/common/redis/redis.service'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
-import { CreateImagDto } from 'src/common/upload/dtos/createImage.dto'
 import { I18nService } from 'nestjs-i18n'
 import { InjectModel } from '@nestjs/sequelize'
+import { Banner } from '../banner/entity/bannner.entity'
 import { Comment } from '../comment/entity/comment.entity '
 import { postLoader } from './loader/post.loader'
 import { Op } from 'sequelize'
@@ -21,7 +21,6 @@ import {
   PostInputResponse,
   PostsInputResponse,
 } from './input/Post.input'
-import { Banner } from '../banner/entity/bannner.entity'
 
 @Injectable()
 export class PostService {
@@ -29,8 +28,6 @@ export class PostService {
     private readonly i18n: I18nService,
     private readonly redisService: RedisService,
     private readonly likeService: LikeService,
-    private readonly uploadService: UploadService,
-    // private readonly likeService: LikeService,
     private readonly postLoader: postLoader,
     private readonly websocketGateway: WebSocketMessageGateway,
     @InjectModel(Post) private postRepo: typeof Post,

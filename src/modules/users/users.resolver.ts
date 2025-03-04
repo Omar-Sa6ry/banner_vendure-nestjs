@@ -28,7 +28,7 @@ export class UserResolver {
       return { data: cachedUser }
     }
 
-    return { data: await this.usersService.findById(id) }
+    return await this.usersService.findById(id)
   }
 
   @Query(returns => UserResponse)
@@ -40,7 +40,7 @@ export class UserResolver {
       return { data: cachedUser }
     }
 
-    return { data: await this.usersService.findByEmail(email) }
+    return await this.usersService.findByEmail(email)
   }
 
   @Query(returns => UserResponse)
@@ -53,7 +53,7 @@ export class UserResolver {
       return { data: cachedUser }
     }
 
-    return { data: await this.usersService.findByUserName(userName) }
+    return await this.usersService.findByUserName(userName)
   }
 
   @Mutation(returns => UserResponse)
@@ -62,21 +62,18 @@ export class UserResolver {
     @Args('updateUserDto') updateUserDto: UpdateUserDto,
     @CurrentUser() user: CurrentUserDto,
   ): Promise<UserResponse> {
-    return { data: await this.usersService.updateUser(updateUserDto, user?.id) }
+    return await this.usersService.update(updateUserDto, user?.id)
   }
 
-  // @Query(returns => String)
-  // @Auth(Role.ADMIN, Role.MANAGER)
-  // async deleteUser (@CurrentUser() user: CurrentUserDto) {
-  //   return await this.usersService.deleteUser(user.id)
-  // }
+  @Query(returns => UserResponse)
+  @Auth(Role.ADMIN, Role.MANAGER)
+  async deleteUser (@CurrentUser() user: CurrentUserDto): Promise<UserResponse> {
+    return await this.usersService.deleteUser(user.id)
+  }
 
-  // @Mutation(returns => String)
-  // @Auth(Role.ADMIN, Role.MANAGER)
-  // async UpdateUserRole (
-  //   @Args('email') email: string,
-  //   @Args('companyId', ParseIntPipe) companyId: number,
-  // ) {
-  //   return await this.usersService.editUserRole(email)
-  // }
+  @Mutation(returns => String)
+  @Auth(Role.ADMIN, Role.MANAGER)
+  async UpdateUserRole (@Args('email') email: string): Promise<UserResponse> {
+    return await this.usersService.editUserRole(email)
+  }
 }
