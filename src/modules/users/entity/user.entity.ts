@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
-import { Role } from 'src/common/constant/enum.constant'
+import { Role, UserStatus } from 'src/common/constant/enum.constant'
 import { Exclude } from 'class-transformer'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
@@ -45,6 +45,13 @@ export class User extends Model {
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
   @Index
   email: string
+
+  @Field()
+  @Column({
+    type: DataType.ENUM(...Object.values(UserStatus)),
+    defaultValue: UserStatus.PUBLIC,
+  })
+  status: UserStatus
 
   @Exclude()
   @Column({ type: DataType.STRING, allowNull: false })

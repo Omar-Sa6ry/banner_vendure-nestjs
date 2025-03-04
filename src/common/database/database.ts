@@ -4,6 +4,7 @@ import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize'
 import { Banner } from 'src/modules/banner/entity/bannner.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
+import { Follow } from 'src/modules/follow/entity/follow.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Like } from 'src/modules/like/entity/like.entity '
 import { Partner } from 'src/modules/partner/entity/partner.entity'
@@ -23,6 +24,7 @@ import { User } from 'src/modules/users/entity/user.entity'
         database: configService.get<string>('DB_NAME'),
         models: [
           User,
+          Follow,
           Campaign,
           Partner,
           Banner,

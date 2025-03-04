@@ -15,6 +15,7 @@ import { CampaignModule } from './modules/campaign/campaign.module'
 import { PartnerModule } from './modules/partner/partner.module'
 import { BannerModule } from './modules/banner/banner.module'
 import { InteractionModule } from './modules/interaction/interaction.module'
+import { FollowModule } from './modules/follow/follow.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { InteractionModule } from './modules/interaction/interaction.module'
 
     AuthModule,
     UserModule,
+    FollowModule,
     CampaignModule,
     PartnerModule,
     BannerModule,

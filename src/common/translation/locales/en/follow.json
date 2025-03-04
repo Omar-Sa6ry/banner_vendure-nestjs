@@ -1,0 +1,14 @@
+{
+  "CREATED": "Follow created successfully",
+  "UPDATED": "Follow updated successfully",
+  "DELETED": "Follow deleted successfully",
+  "PRIVACY": "Account is privacy",
+  "NOT_FOUND": "Follow not found",
+  "NOT_FOUNDER": "Follower not found",
+  "NOT_FOUNDING": "Following not found",
+  "NOT_FOLLOW_YOU": "not follow you",
+  "REJECT": "Follow is Rejected",
+  "ACCEPT": "Follow is Accept",
+  "REQUEST": "There is no request",
+  "NO_RELATION": "No relation"
+}

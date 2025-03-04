@@ -5,6 +5,20 @@ export enum Role {
   MANAGER = 'manager',
 }
 
+export enum UserStatus {
+  PUBLIC = 'public',
+  PRIVACY = 'privacy',
+}
+
+export enum Status {
+  BLOCK = 'block',
+  REJECTED = 'rejected',
+  FOLLOW = 'follow',
+  PENDING = 'pending',
+  FRIEND = 'friend',
+}
+
+
 export enum InterActionType {
   VIEW = 'view',
   CLICK = 'click',

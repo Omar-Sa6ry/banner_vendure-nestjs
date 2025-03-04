@@ -94,7 +94,7 @@ export class InteractionService {
       const relationCacheKey = `interaction:${interaction.id}`
       await this.redisService.set(relationCacheKey, result)
 
-      await this.websocketGateway.broadcast('interactionCreated', {
+      this.websocketGateway.broadcast('interactionCreated', {
         interactionId: interaction.id,
         interaction,
       })
