@@ -75,7 +75,7 @@ export class Campaign extends Model<Campaign> {
   })
   updatedAt: Date
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User
 

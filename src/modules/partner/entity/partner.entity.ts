@@ -31,10 +31,10 @@ export class Partner extends Model<Partner> {
   @CreatedAt
   createdAt: Date
 
-  @BelongsTo(() => Campaign)
+  @BelongsTo(() => Campaign, { onDelete: 'CASCADE' })
   campaign: Campaign
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User
 
   @HasMany(() => Banner)

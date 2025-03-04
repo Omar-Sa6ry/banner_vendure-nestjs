@@ -1,3 +1,5 @@
+import { Like } from 'src/modules/like/entity/like.entity '
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 import { User } from 'src/modules/users/entity/user.entity'
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 import {
@@ -11,8 +13,6 @@ import {
   DataType,
   HasMany,
 } from 'sequelize-typescript'
-import { Like } from 'src/modules/like/entity/like.entity '
-import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
 @ObjectType()
 @Table({ timestamps: true })
@@ -43,10 +43,10 @@ export class Post extends Model<Post> {
   @UpdatedAt
   updatedAt: Date
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User
 
-  @BelongsTo(() => Banner)
+  @BelongsTo(() => Banner, { onDelete: 'CASCADE' })
   banner: Banner
 
   @HasMany(() => Like)

@@ -10,13 +10,14 @@ import { CreateImagDto } from '../../common/upload/dtos/createImage.dto'
 import { CurrentUser } from 'src/common/decerator/currentUser.decerator'
 import { CurrentUserDto } from 'src/common/dtos/currentUser.dto'
 import { Role } from 'src/common/constant/enum.constant'
-import { NoToken } from 'src/common/constant/messages.constant'
 import { RedisService } from 'src/common/redis/redis.service'
 import { Auth } from 'src/common/decerator/auth.decerator'
+import { I18nService } from 'nestjs-i18n'
 
 @Resolver(of => User)
 export class AuthResolver {
   constructor (
+    private readonly i18n: I18nService,
     private readonly redisService: RedisService,
     private authService: AuthService,
   ) {}
@@ -115,9 +116,8 @@ export class AuthResolver {
   @Auth(Role.ADMIN, Role.MANAGER)
   async logout (@Context('req') req): Promise<boolean> {
     const token = req.headers.authorization?.replace('Bearer ', '')
-    if (!token) {
-      throw new Error(NoToken)
-    }
+    if (!token) throw new Error(await this.i18n.t('user.NO_TOKEN'))
+
     return true
   }
 }

@@ -49,10 +49,10 @@ export class Interaction extends Model<Interaction> {
   @CreatedAt
   createdAt: Date
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User
 
-  @BelongsTo(() => Banner)
+  @BelongsTo(() => Banner, { onDelete: 'CASCADE' })
   banner: Banner
 
   @BeforeCreate

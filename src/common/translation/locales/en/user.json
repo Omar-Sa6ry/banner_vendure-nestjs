@@ -12,6 +12,9 @@
   "USERNAME_USED": "Username is used",
   "UPDATE_PASSWORD": "your password is updated successfully",
   "SEND_MSG": "Message sent successfully for your gmail",
+  "NO_TOKEN": "No Token",
+  "INVALID_TOKEN": "Invalid token",
+  "INVALID_TOKEN_PAYLOAD": "Invalid token payload",
   "OLD_IS_EQUAL_NEW": "old password is equal to new password",
   "ROLE": "you arenot partner"
 }

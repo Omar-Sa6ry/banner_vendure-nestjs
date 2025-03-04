@@ -50,9 +50,9 @@ export class Comment extends Model<Comment> {
   @UpdatedAt
   updatedAt: Date
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User
 
-  @BelongsTo(() => Post)
+  @BelongsTo(() => Post, { onDelete: 'CASCADE' })
   post: Post
 }

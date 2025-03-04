@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql'
+import { PasswordValidator } from 'src/common/constant/messages.constant'
 import {
   IsEmail,
   IsString,
@@ -6,7 +7,6 @@ import {
   IsLowercase,
   Length,
 } from 'class-validator'
-import { PasswordValidator } from 'src/common/constant/messages.constant'
 
 @InputType()
 export class CreateUserDto {

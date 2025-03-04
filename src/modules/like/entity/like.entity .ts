@@ -39,9 +39,9 @@ export class Like extends Model<Like> {
   @CreatedAt
   createdAt: Date
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User
 
-  @BelongsTo(() => Post)
+  @BelongsTo(() => Post, { onDelete: 'CASCADE' })
   post: Post
 }

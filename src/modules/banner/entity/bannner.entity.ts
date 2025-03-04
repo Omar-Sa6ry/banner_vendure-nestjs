@@ -93,10 +93,10 @@ export class Banner extends Model<Banner> {
   @Field(() => Date)
   updatedAt: Date
 
-  @BelongsTo(() => Partner)
+  @BelongsTo(() => Partner, { onDelete: 'CASCADE' })
   creator: Partner
 
-  @BelongsTo(() => Campaign)
+  @BelongsTo(() => Campaign, { onDelete: 'CASCADE' })
   campaign: Campaign
 
   @HasMany(() => Interaction)
