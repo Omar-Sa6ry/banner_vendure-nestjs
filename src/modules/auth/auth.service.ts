@@ -144,7 +144,7 @@ export class AuthService {
     if (!(user instanceof User))
       throw new BadRequestException(await this.i18n.t('user.EMAIL_WRONG'))
 
-    if (user.role !== Role.USER)
+    if (user.role === Role.MANAGER || user.role === Role.ADMIN)
       throw new BadRequestException(await this.i18n.t('user.NOT_ADMIN'))
 
     const token = randomBytes(32).toString('hex')

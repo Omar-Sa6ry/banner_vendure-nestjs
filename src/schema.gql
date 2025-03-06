@@ -2,20 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Post {
-  id: Int!
-  content: String!
-  bannerId: Int!
-  userId: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type User {
   id: Int!
   userName: String!
@@ -27,6 +13,11 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Campaign {
   id: Int!
@@ -155,7 +146,7 @@ type LikeResponse {
 
 type CommentOutput {
   id: Float!
-  content: String!
+  content: String
   post: PostOutput!
   user: User!
   createdAt: DateTime!
@@ -437,7 +428,7 @@ type Query {
   getBanners(page: Int, limit: Int): BannersResponse!
   getPostById(id: Int!): PostResponse!
   searchPosts(content: String, page: Int, limit: Int): PostsResponse!
-  getUserPosts: PostsResponse!
+  getUserPosts(userId: Int!): PostsResponse!
   likedUser(page: Int, limit: Int): LikesResponse!
   postLikeCount(postId: Int!): LikeResponse!
   getCommentById(id: Int!): CommentResponse!
@@ -446,8 +437,8 @@ type Query {
   getCountCommentPost(postId: Int!): Int!
   getCommentsByUserOnPost(postId: Int!): CommentsResponse!
   getCommentsByUser: CommentsResponse!
-  getUserByComment(commentId: Int!): User!
-  getPostByComment(commentId: Int!): Post!
+  getUserByComment(commentId: Int!): UserResponse!
+  getPostByComment(commentId: Int!): PostResponse!
 }
 
 input CampaignDto {

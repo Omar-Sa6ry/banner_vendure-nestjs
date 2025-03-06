@@ -59,33 +59,36 @@ export class CommentLoader {
           commentPostMap.get(comment.postId)?.push(comment)
         })
 
-        const postLikes = await this.likeRepo.findAll({
-          where: { postId: { [Op.in]: postIds } },
+        const likes = await this.likeRepo.findAll({
+          where: { postId: { [Op.in]: keys } },
         })
-        const postlikeMap = new Map<number, Like[]>()
-        postLikes.forEach(like => {
-          if (!postlikeMap.has(like.postId)) {
-            postlikeMap.set(like.postId, [])
+        const likeMap = new Map<number, Like[]>()
+        likes.forEach(like => {
+          if (!likeMap.has(like.postId)) {
+            likeMap.set(like.postId, [])
           }
-          postlikeMap.get(like.postId)?.push(like)
+          likeMap.get(like.postId)?.push(like)
         })
 
         return keys.map(id => {
-          const comment = commentMap.get(id)
+          const comment = commentMap.get(id).dataValues
           if (!comment)
             throw new NotFoundException(this.i18n.t('comment.NOT_FOUND'))
 
-          const user = userMap.get(comment.userId)
-          const post = posttMap.get(comment.postId)
-          const userPost = userPostMap.get(post.userId)
-          const comments = commentPostMap.get(post.id)
-          const likes = postlikeMap.get(post.id).length
+          const user = userMap.get(comment.userId).dataValues
+          const post = posttMap.get(comment.postId).dataValues
+          const userPost = userPostMap.get(post.userId).dataValues
+          const comments = commentPostMap
+            .get(post.id)
+            .map(comment => comment.dataValues)
+          const likes = likeMap.get(post.id)?.length || 0
 
           const result: CommentInput = {
             ...comment,
             user,
             post: { ...post, user: userPost, likes, comments },
           }
+
           return result
         })
       },

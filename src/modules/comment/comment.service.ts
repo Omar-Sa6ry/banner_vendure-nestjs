@@ -6,12 +6,15 @@ import {
 import { Comment } from './entity/comment.entity '
 import { User } from '../users/entity/user.entity'
 import { Post } from '../post/entity/post.entity '
+import { PostInputResponse } from '../post/input/Post.input'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { InjectModel } from '@nestjs/sequelize'
+import { Banner } from '../banner/entity/bannner.entity'
 import { LikeService } from '../like/like.service'
 import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { I18nService } from 'nestjs-i18n'
 import { RedisService } from 'src/common/redis/redis.service'
+import { UserInputResponse } from '../users/input/User.input'
 import { Limit, Page } from 'src/common/constant/messages.constant'
 import { CommentLoader } from './loader/comment.loader'
 import {
@@ -25,6 +28,7 @@ export class CommentService {
   constructor (
     @InjectModel(Comment) private commentRepo: typeof Comment,
     @InjectModel(Post) private postRepo: typeof Post,
+    @InjectModel(Banner) private bannerRepo: typeof Banner,
     @InjectModel(User) private userRepo: typeof User,
     private readonly i18n: I18nService,
     private commentLoader: CommentLoader,
@@ -46,17 +50,15 @@ export class CommentService {
         where: { id: userId },
         transaction,
       })
-      if (!user) {
+      if (!user)
         throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
-      }
 
       const post = await this.postRepo.findOne({
         where: { id: postId },
         transaction,
       })
-      if (!post) {
+      if (!post)
         throw new NotFoundException(await this.i18n.t('post.NOT_FOUND'))
-      }
 
       const comment = await this.commentRepo.create(
         { userId, content, postId },
@@ -66,20 +68,19 @@ export class CommentService {
       const comments = await this.commentRepo.findAll({
         where: { postId: post.id },
       })
-      const likes = +(await this.likeService.numPostLikes(post.id)).message
+
+      const likes = +(await this.likeService.numPostLikes(post.id)).message || 0
       await transaction.commit()
 
-      const userPost = await this.userRepo.findByPk(post.userId)
+      const userPost = (await this.userRepo.findByPk(post.userId))?.dataValues
 
       const data: CommentInput = {
-        id: comment.id,
-        createdAt: comment.createdAt,
-        user,
-        content,
+        ...comment.dataValues,
+        user: user.dataValues,
         post: {
-          ...post,
+          ...post.dataValues,
           user: userPost,
-          comments,
+          comments: comments.map(comment => comment.dataValues),
           likes,
         },
       }
@@ -250,13 +251,10 @@ export class CommentService {
   ): Promise<CommentsInputResponse> {
     const { rows: data, count: total } = await this.commentRepo.findAndCountAll(
       {
-        where: {
-          userId,
-          postId,
-        },
+        where: { userId, postId },
+        order: [['createdAt', 'DESC']],
         offset: (page - 1) * limit,
         limit,
-        order: [['createdAt', 'DESC']],
       },
     )
 
@@ -324,20 +322,61 @@ export class CommentService {
     }
   }
 
-  async getUserByComment (id: number): Promise<User> {
+  async getUserByComment (id: number): Promise<UserInputResponse> {
     const comment = await this.commentRepo.findOne({ where: { id } })
     if (!comment)
       throw new NotFoundException(await this.i18n.t('comment.NOT_FOUND'))
 
-    return await this.userRepo.findOne({ where: { id: comment.userId } })
+    return {
+      data: (await this.userRepo.findOne({ where: { id: comment.userId } }))
+        ?.dataValues,
+    }
   }
 
-  async getPostByComment (id: number): Promise<Post> {
+  async getPostByComment (id: number): Promise<PostInputResponse> {
     const comment = await this.commentRepo.findOne({ where: { id } })
     if (!comment)
       throw new NotFoundException(await this.i18n.t('comment.NOT_FOUND'))
 
-    return await this.postRepo.findOne({ where: { id: comment.postId } })
+    const post = await (
+      await this.postRepo.findOne({ where: { id: comment.postId } })
+    )?.dataValues
+    if (!post) throw new NotFoundException(await this.i18n.t('post.NOT_FOUND'))
+
+    const user = await this.userRepo.findOne({
+      where: { id: post.userId },
+    })
+    if (!user)
+      throw new BadRequestException(await this.i18n.t('user.NOT_FOUND'))
+
+    const comments = await this.commentRepo.findAll({
+      where: { postId: post.id },
+      order: [['createdAt', 'DESC']],
+      limit: 10,
+    })
+
+    const likes = +(await this.likeService.numPostLikes(post.id)).message || 0
+
+    const banner = await (
+      await this.bannerRepo.findByPk(post.bannerId)
+    )?.dataValues
+    if (!banner)
+      throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))
+
+    const data: PostInputResponse = {
+      data: {
+        ...post,
+        likes,
+        banner,
+        user: user.dataValues,
+        comments: comments.map(comment => comment.dataValues),
+      },
+    }
+
+    const relationCacheKey = `posts:${id}`
+    await this.redisService.set(relationCacheKey, post)
+
+    return data
   }
 
   async getCountCommentPost (postId: number): Promise<number> {
@@ -355,9 +394,7 @@ export class CommentService {
     const user = await this.userRepo.findOne({
       where: { id: userId },
     })
-    if (!user) {
-      throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
-    }
+    if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
     const comment = await this.commentRepo.findOne({
       where: { id, userId },
@@ -385,14 +422,17 @@ export class CommentService {
     })
     const likes = +(await this.likeService.numPostLikes(post.id)).message
 
-    const userPost = await this.userRepo.findByPk(post.userId)
+    const userPost = (await this.userRepo.findByPk(post.userId))?.dataValues
 
     const data: CommentInput = {
-      id: comment.id,
-      content: comment.content,
-      post: { ...post, user: userPost, likes, comments },
-      user,
-      createdAt: comment.createdAt,
+      ...comment.dataValues,
+      post: {
+        ...post.dataValues,
+        user: userPost,
+        likes,
+        comments: comments.map(comment => comment.dataValues),
+      },
+      user: user.dataValues,
     }
     const relationCacheKey = `comment:${post.id}`
     await this.redisService.set(relationCacheKey, data)

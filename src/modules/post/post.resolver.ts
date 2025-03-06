@@ -17,7 +17,7 @@ export class PostResolver {
   ) {}
 
   @Mutation(() => PostResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async createPost (
     @CurrentUser() user: CurrentUserDto,
     @Args('content', { type: () => String }) content: string,
@@ -49,15 +49,15 @@ export class PostResolver {
   }
 
   @Query(() => PostsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getUserPosts (
-    @CurrentUser() user: CurrentUserDto,
+    @Args('userId', { type: () => Int }) userId: number,
   ): Promise<PostsResponse> {
-    return await this.postService.userPosts(user.id)
+    return await this.postService.userPosts(userId)
   }
 
   @Mutation(() => PostResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async updatePost (
     @CurrentUser() user: CurrentUserDto,
     @Args('id', { type: () => Int }) id: number,
@@ -67,7 +67,7 @@ export class PostResolver {
   }
 
   @Mutation(() => PostResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async deletePost (
     @CurrentUser() user: CurrentUserDto,
     @Args('id', { type: () => Int }) id: number,

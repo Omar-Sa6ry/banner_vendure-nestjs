@@ -15,7 +15,7 @@ import {
 } from 'sequelize-typescript'
 
 @ObjectType()
-@Table({ timestamps: true })
+@Table({ timestamps: true, tableName: 'posts' })
 export class Post extends Model<Post> {
   @Field(() => Int)
   @Column({ autoIncrement: true, primaryKey: true })

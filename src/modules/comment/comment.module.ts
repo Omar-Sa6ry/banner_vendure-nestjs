@@ -12,6 +12,7 @@ import { RedisModule } from 'src/common/redis/redis.module'
 import { LikeModule } from '../like/like.module'
 import { Like } from '../like/entity/like.entity '
 import { NotificationModule } from 'src/common/queues/notification/notification.module'
+import { Banner } from '../banner/entity/bannner.entity'
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { NotificationModule } from 'src/common/queues/notification/notification.
     RedisModule,
     LikeModule,
     NotificationModule,
-    SequelizeModule.forFeature([Post, User, Like, Comment]),
+    SequelizeModule.forFeature([Post, Banner, User, Like, Comment]),
   ],
   providers: [CommentResolver, CommentService, CommentLoader],
 })

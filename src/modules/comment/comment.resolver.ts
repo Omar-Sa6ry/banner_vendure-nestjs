@@ -1,15 +1,15 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
 import { CommentService } from './comment.service'
-import { User } from '../users/entity/user.entity'
 import { Auth } from 'src/common/decerator/auth.decerator'
 import { Role } from 'src/common/constant/enum.constant'
 import { CurrentUser } from 'src/common/decerator/currentUser.decerator'
 import { CurrentUserDto } from 'src/common/dtos/currentUser.dto'
-import { Post } from '../post/entity/post.entity '
 import { Comment } from './entity/comment.entity '
 import { CommentResponse, CommentsResponse } from './dto/CommentResponse.dto'
 import { RedisService } from 'src/common/redis/redis.service'
 import { CommentInputResponse } from './input/comment.input'
+import { UserResponse } from '../users/dtos/UserResponse.dto'
+import { PostResponse } from '../post/dto/PostResponse.dto'
 
 @Resolver(() => Comment)
 export class CommentResolver {
@@ -19,7 +19,7 @@ export class CommentResolver {
   ) {}
 
   @Mutation(() => CommentResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async writeComment (
     @CurrentUser() user: CurrentUserDto,
     @Args('postId', { type: () => Int }) postId: number,
@@ -42,7 +42,7 @@ export class CommentResolver {
   }
 
   @Query(() => CommentResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getComment (
     @CurrentUser() user: CurrentUserDto,
     @Args('postId', { type: () => Int }) postId: number,
@@ -52,7 +52,7 @@ export class CommentResolver {
   }
 
   @Query(() => CommentsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCommentsForPost (
     @Args('postId', { type: () => Int }) postId: number,
     @Args('page', { type: () => Int, nullable: true }) page: number,
@@ -62,7 +62,7 @@ export class CommentResolver {
   }
 
   @Query(() => Int)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCountCommentPost (
     @Args('postId', { type: () => Int }) postId: number,
   ): Promise<number> {
@@ -70,7 +70,7 @@ export class CommentResolver {
   }
 
   @Query(() => CommentsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCommentsByUserOnPost (
     @CurrentUser() user: CurrentUserDto,
     @Args('postId', { type: () => Int }) postId: number,
@@ -79,31 +79,31 @@ export class CommentResolver {
   }
 
   @Query(() => CommentsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCommentsByUser (
     @CurrentUser() user: CurrentUserDto,
   ): Promise<CommentsResponse> {
     return await this.commentService.getCommentUser(user.id)
   }
 
-  @Query(() => User)
-  @Auth(Role.USER)
+  @Query(() => UserResponse)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getUserByComment (
     @Args('commentId', { type: () => Int }) commentId: number,
-  ): Promise<User> {
+  ): Promise<UserResponse> {
     return this.commentService.getUserByComment(commentId)
   }
 
-  @Query(() => Post)
-  @Auth(Role.USER)
+  @Query(() => PostResponse)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getPostByComment (
     @Args('commentId', { type: () => Int }) commentId: number,
-  ): Promise<Post> {
+  ): Promise<PostResponse> {
     return this.commentService.getPostByComment(commentId)
   }
 
   @Mutation(() => CommentResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async updateComment (
     @CurrentUser() user: CurrentUserDto,
     @Args('commentId', { type: () => Int }) commentId: number,
@@ -113,7 +113,7 @@ export class CommentResolver {
   }
 
   @Mutation(() => CommentResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async deleteComment (
     @CurrentUser() user: CurrentUserDto,
     @Args('commentId', { type: () => Int }) commentId: number,

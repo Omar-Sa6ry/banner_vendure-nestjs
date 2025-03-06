@@ -40,12 +40,14 @@ export class PostService {
     bannerId: number,
     content: string,
   ): Promise<PostInputResponse> {
-    const user = await this.userRepo.findOne({ where: { id: userId } })
+    const user = await (
+      await this.userRepo.findOne({ where: { id: userId } })
+    )?.dataValues
     if (!user) {
       throw new BadRequestException(await this.i18n.t('user.NOT_FOUND'))
     }
 
-    const banner = await this.bannerRepo.findByPk(bannerId)
+    const banner = await (await this.bannerRepo.findByPk(bannerId))?.dataValues
     if (!banner)
       throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))
 
@@ -139,14 +141,13 @@ export class PostService {
   ): Promise<PostsInputResponse> {
     const { rows: data, count: total } = await this.postRepo.findAndCountAll({
       where: { content: { [Op.iLike]: `%${content}%` } },
-      limit,
-      offset: (page - 1) * limit,
       order: [['createdAt', 'DESC']],
+      offset: (page - 1) * limit,
+      limit,
     })
 
-    if (data.length === 0) {
+    if (data.length === 0)
       throw new NotFoundException(await this.i18n.t('post.NOT_FOUNDS'))
-    }
 
     const postsIds = data.map(post => post.id)
     const posts = await this.postLoader.loadMany(postsIds)
@@ -219,17 +220,15 @@ export class PostService {
         where: { id: userId },
         transaction,
       })
-      if (!user) {
+      if (!user)
         throw new BadRequestException(await this.i18n.t('user.NOT_FOUND'))
-      }
 
       const post = await this.postRepo.findOne({
         where: { id, userId },
         transaction,
       })
-      if (!post) {
+      if (!post)
         throw new NotFoundException(await this.i18n.t('post.NOT_FOUND'))
-      }
 
       post.content = content
       await post.save({ transaction })
@@ -253,7 +252,13 @@ export class PostService {
 
       const result: PostInputResponse = {
         message: await this.i18n.t('post.UPDATED'),
-        data: { ...post, user, comments, likes },
+        data: {
+          ...post.dataValues,
+          banner: banner.dataValues,
+          user: user.dataValues,
+          comments,
+          likes,
+        },
       }
 
       const relationCacheKey = `post:${post.id}`

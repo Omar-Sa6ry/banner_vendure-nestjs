@@ -17,7 +17,7 @@ export class LikeResolver {
   ) {}
 
   @Mutation(() => LikeResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async likePost (
     @CurrentUser() user: CurrentUserDto,
     @Args('postId', { type: () => Int }) postId: number,
@@ -26,7 +26,7 @@ export class LikeResolver {
   }
 
   @Mutation(() => String)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async unlikePost (
     @CurrentUser() user: CurrentUserDto,
     @Args('postId', { type: () => Int }) postId: number,
@@ -35,7 +35,7 @@ export class LikeResolver {
   }
 
   @Query(() => LikesResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async likedUser (
     @CurrentUser() user: CurrentUserDto,
     @Args('page', { type: () => Int, nullable: true }) page: number,
@@ -51,7 +51,7 @@ export class LikeResolver {
   }
 
   @Query(() => LikeResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async postLikeCount (
     @Args('postId', { type: () => Int }) postId: number,
   ): Promise<LikeResponse> {

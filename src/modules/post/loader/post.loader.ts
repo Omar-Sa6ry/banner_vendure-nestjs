@@ -8,6 +8,7 @@ import { I18nService } from 'nestjs-i18n'
 import { PostInput } from '../input/Post.input'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { Like } from 'src/modules/like/entity/like.entity '
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
 @Injectable()
 export class postLoader {
@@ -15,6 +16,7 @@ export class postLoader {
 
   constructor (
     @InjectModel(Comment) private commentRepo: typeof Comment,
+    @InjectModel(Banner) private bannerRepo: typeof Banner,
     @InjectModel(Post) private postRepo: typeof Post,
     @InjectModel(User) private userRepo: typeof User,
     @InjectModel(Like) private likeRepo: typeof Like,
@@ -25,13 +27,12 @@ export class postLoader {
         where: { id: { [Op.in]: keys } },
       })
 
-      const postIds = [...new Set(posts.map(post => post.id))]
       const comments = await this.commentRepo.findAll({
-        where: { postId: { [Op.in]: postIds } },
+        where: { postId: { [Op.in]: keys } },
       })
 
       const likes = await this.likeRepo.findAll({
-        where: { postId: { [Op.in]: postIds } },
+        where: { postId: { [Op.in]: keys } },
       })
       const likeMap = new Map<number, Like[]>()
       likes.forEach(like => {
@@ -46,7 +47,13 @@ export class postLoader {
         where: { id: { [Op.in]: userIds } },
       })
 
+      const bannerIds = [...new Set(posts.map(post => post.bannerId))]
+      const banners = await this.bannerRepo.findAll({
+        where: { id: { [Op.in]: bannerIds } },
+      })
+
       const postMap = new Map(posts.map(post => [post.id, post]))
+      const bannerMap = new Map(banners.map(banner => [banner.id, banner]))
       const userMap = new Map(users.map(user => [user.id, user]))
       const commentMap = new Map<number, Comment[]>()
       comments.forEach(comment => {
@@ -57,19 +64,23 @@ export class postLoader {
       })
 
       return keys.map(id => {
-        const post = postMap.get(id)
+        const post = postMap.get(id)?.dataValues
         if (!post) throw new NotFoundException(this.i18n.t('post.NOT_FOUND'))
 
         const comments = commentMap.get(id)
-        const user = userMap.get(post.userId)
-        const likes = likeMap.get(id).length
+        const banner = bannerMap.get(post.bannerId).dataValues
+        const user = userMap.get(post.userId).dataValues
+        const likes = likeMap.get(id) || []
 
-        return {
+        const result: PostInput = {
           ...post,
           user,
+          banner,
           comments,
-          likes,
+          likes: likes.length || 0,
         }
+
+        return result
       })
     })
   }

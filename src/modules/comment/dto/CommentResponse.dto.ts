@@ -14,8 +14,7 @@ export class CommentOutput {
   @Expose()
   id: number
 
-  @Field()
-  @IsString()
+  @Field({ nullable: true })
   @Expose()
   content: string
 

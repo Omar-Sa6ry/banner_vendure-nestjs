@@ -13,7 +13,7 @@ export class FollowResolver {
   constructor (private readonly followService: FollowService) {}
 
   @Mutation(() => FollowResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async followUser (
     @CurrentUser() user: User,
     @Args('followingId') followingId: number,
@@ -22,7 +22,7 @@ export class FollowResolver {
   }
 
   @Mutation(() => FollowResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async unfollowingUser (
     @CurrentUser() user: User,
     @Args('followerId') followerId: number,
@@ -31,7 +31,7 @@ export class FollowResolver {
   }
 
   @Query(() => FollowResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getRelationStatus (
     @CurrentUser() user: User,
     @Args('followingId') followingId: number,
@@ -40,7 +40,7 @@ export class FollowResolver {
   }
 
   @Query(() => FollowsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getFollowers (
     @Args('followerId') followerId: number,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
@@ -50,7 +50,7 @@ export class FollowResolver {
   }
 
   @Query(() => FollowsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getFollowings (
     @Args('followingId') followingId: number,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
@@ -60,7 +60,7 @@ export class FollowResolver {
   }
 
   @Query(() => FollowsResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getFriends (
     @CurrentUser() user: CurrentUserDto,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
@@ -70,7 +70,7 @@ export class FollowResolver {
   }
 
   @Mutation(() => FollowResponse)
-  @Auth(Role.USER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async acceptFollowRequest (
     @CurrentUser() user: CurrentUserDto,
     @Args('followingId') followingId: number,
