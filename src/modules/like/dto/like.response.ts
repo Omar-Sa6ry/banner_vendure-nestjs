@@ -3,6 +3,7 @@ import { Expose } from 'class-transformer'
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
+import { PostOutput } from 'src/modules/post/dto/PostResponse.dto'
 import { PostInput } from 'src/modules/post/input/Post.input'
 import { User } from 'src/modules/users/entity/user.entity'
 
@@ -12,7 +13,7 @@ export class LikeOutput {
   @IsInt()
   id: number
 
-  @Field(() => PostInput)
+  @Field(() => PostOutput)
   post: PostInput
 
   @Field(() => User)

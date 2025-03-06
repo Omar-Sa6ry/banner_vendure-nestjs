@@ -1,0 +1,7 @@
+{
+  "CREATED": "Buyer created successfully",
+  "UPDATED": "Buyer updated successfully",
+  "DELETED": "Buyer deleted successfully",
+  "NOT_FOUND": "Buyer not found",
+  "NOT_FOUNDS": "Buyers not found"
+}

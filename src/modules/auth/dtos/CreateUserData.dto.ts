@@ -19,12 +19,15 @@ export class CreateUserDto {
   @IsLowercase()
   email: string
 
+  @Field({ nullable: true })
+  bio: string
+
   @Field()
   @IsString()
   @Length(8, 16, { message: PasswordValidator })
   password: string
 
   @Field()
-  @IsPhoneNumber()
+  @IsPhoneNumber('EG')
   phone: string
 }

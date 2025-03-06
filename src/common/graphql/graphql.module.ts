@@ -20,7 +20,7 @@ import { join } from 'path'
         const originalError = error.extensions || {}
         return {
           ...originalError,
-          message: originalError.message || error.message || 'Unknown error',
+          message: error.message || originalError.message || 'Unknown error',
           success: false,
           statusCode: originalError.statusCode || 500,
           timeStamp: new Date().toISOString().split('T')[0],

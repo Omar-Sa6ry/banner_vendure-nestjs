@@ -1,7 +1,7 @@
 import { Args, Context, Int, Mutation, Resolver } from '@nestjs/graphql'
 import { AuthService } from './auth.service'
 import { User } from '../users/entity/user.entity'
-import { AuthOutPut, AuthResponse } from './dtos/AuthRes.dto'
+import { AuthResponse } from './dtos/AuthRes.dto'
 import { CreateUserDto } from './dtos/CreateUserData.dto'
 import { LoginDto } from './dtos/Login.dto'
 import { ResetPasswordDto } from './dtos/ResetPassword.dto'
@@ -13,6 +13,7 @@ import { Role } from 'src/common/constant/enum.constant'
 import { RedisService } from 'src/common/redis/redis.service'
 import { Auth } from 'src/common/decerator/auth.decerator'
 import { I18nService } from 'nestjs-i18n'
+import { UserResponse } from '../users/dtos/UserResponse.dto'
 
 @Resolver(of => User)
 export class AuthResolver {
@@ -46,24 +47,28 @@ export class AuthResolver {
     return await this.authService.login(fcmToken, loginDto)
   }
 
-  @Mutation(returns => String)
-  async forgotPassword (@Args('email') email: string) {
-    await this.authService.forgotPassword(email)
+  @Mutation(returns => AuthResponse)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
+  async forgotPassword (
+    @CurrentUser() user: CurrentUserDto,
+  ): Promise<AuthResponse> {
+    return await this.authService.forgotPassword(user.email)
   }
 
-  @Mutation(returns => String)
+  @Mutation(returns => AuthResponse)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async resetPassword (
     @Args('resetPasswordDto') resetPasswordDto: ResetPasswordDto,
-  ) {
-    await this.authService.resetPassword(resetPasswordDto)
+  ): Promise<UserResponse> {
+    return await this.authService.resetPassword(resetPasswordDto)
   }
 
-  @Mutation(returns => String)
-  @Auth(Role.ADMIN, Role.MANAGER)
+  @Mutation(returns => AuthResponse)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async changePassword (
     @CurrentUser() user: CurrentUserDto,
     @Args('changePasswordDto') changePasswordDto: ChangePasswordDto,
-  ) {
+  ): Promise<UserResponse> {
     return await this.authService.changePassword(user?.id, changePasswordDto)
   }
 

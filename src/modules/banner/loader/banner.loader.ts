@@ -9,6 +9,7 @@ import { Banner } from '../entity/bannner.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { InterActionType } from 'src/common/constant/enum.constant'
+import { Partner } from 'src/modules/partner/entity/partner.entity'
 
 @Injectable()
 export class BannerLoader {
@@ -19,6 +20,7 @@ export class BannerLoader {
     @InjectModel(Interaction) private interactionRepo: typeof Interaction,
     @InjectModel(Campaign) private campaignRepo: typeof Campaign,
     @InjectModel(User) private userRepo: typeof User,
+    @InjectModel(Partner) private partnerRepo: typeof Partner,
     private readonly i18n: I18nService,
   ) {
     this.loader = new DataLoader<
@@ -38,7 +40,9 @@ export class BannerLoader {
         userId,
       }))
 
-      await this.interactionRepo.bulkCreate(interactionsToInsert)
+      await this.interactionRepo.bulkCreate(interactionsToInsert, {
+        ignoreDuplicates: true,
+      })
 
       const interactions = await this.interactionRepo.findAll({
         where: { bannerId: { [Op.in]: bannerIds } },
@@ -49,21 +53,23 @@ export class BannerLoader {
       const clicksMap = new Map<number, number>()
 
       interactions.forEach(interaction => {
+        const bannerId = interaction.bannerId
+
         if (interaction.type === InterActionType.VIEW) {
-          viewsMap.set(
-            interaction.bannerId,
-            viewsMap.get(interaction.bannerId) || 0,
-          )
-        } else {
-          clicksMap.set(
-            interaction.bannerId,
-            clicksMap.get(interaction.bannerId) || 0,
-          )
+          if (!viewsMap.has(bannerId)) {
+            viewsMap.set(bannerId, 0)
+          }
+          viewsMap.set(bannerId, viewsMap.get(bannerId)! + 1)
+        } else if (interaction.type === InterActionType.CLICK) {
+          if (!clicksMap.has(bannerId)) {
+            clicksMap.set(bannerId, 0)
+          }
+          clicksMap.set(bannerId, clicksMap.get(bannerId)! + 1)
         }
       })
 
       const userIds = [...new Set(banners.map(Banner => Banner.createdBy))]
-      const users = await this.userRepo.findAll({
+      const users = await this.partnerRepo.findAll({
         where: { id: { [Op.in]: userIds } },
       })
       const userMap = new Map(users.map(user => [user.id, user]))
@@ -81,18 +87,18 @@ export class BannerLoader {
         if (!banner)
           throw new NotFoundException(this.i18n.t('banner.NOT_FOUND'))
 
-        const views = viewsMap.get(banner.id)
-        const clicks = clicksMap.get(banner.id)
+        const views = viewsMap.get(banner.id) || 0
+        const clicks = clicksMap.get(banner.id) || 0
 
-        const user = userMap.get(banner.createdBy)
+        const user = userMap.get(banner.createdBy).dataValues
         if (!user) throw new NotFoundException(this.i18n.t('user.NOT_FOUND'))
 
-        const campaign = campaignMap.get(banner.campaignId)
+        const campaign = campaignMap.get(banner.campaignId).dataValues
         if (!campaign)
           throw new NotFoundException(this.i18n.t('campaign.NOT_FOUND'))
 
         const result: BannerInput = {
-          ...banner,
+          ...banner.dataValues,
           views,
           clicks,
           createdBy: user,

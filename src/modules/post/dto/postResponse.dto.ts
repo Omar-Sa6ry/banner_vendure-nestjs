@@ -8,7 +8,7 @@ import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 
 @ObjectType()
-export class PostInput {
+export class PostOutput {
   @Field()
   @IsInt()
   id: number
@@ -36,9 +36,9 @@ export class PostInput {
 
 @ObjectType()
 export class PostsResponse extends BaseResponse {
-  @Field(() => [PostInput], { nullable: true })
+  @Field(() => [PostOutput], { nullable: true })
   @Expose()
-  items: PostInput[]
+  items: PostOutput[]
 
   @IsOptional()
   @Field(() => PaginationInfo, { nullable: true })
@@ -48,7 +48,7 @@ export class PostsResponse extends BaseResponse {
 
 @ObjectType()
 export class PostResponse extends BaseResponse {
-  @Field(() => PostInput, { nullable: true })
+  @Field(() => PostOutput, { nullable: true })
   @Expose()
-  data: PostInput
+  data: PostOutput
 }

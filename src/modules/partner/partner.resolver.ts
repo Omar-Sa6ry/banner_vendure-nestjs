@@ -15,7 +15,7 @@ export class PartnerResolver {
   ) {}
 
   @Mutation(() => PartnerResponse)
-  @Auth(Role.ADMIN, Role.MANAGER)
+  @Auth(Role.VENDOR)
   async addPartner (
     @Args('campaignId', { type: () => Int }) campaignId: number,
     @Args('userId', { type: () => Int }) userId: number,
@@ -24,7 +24,7 @@ export class PartnerResolver {
   }
 
   @Query(() => PartnerResponse)
-  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getPartnerById (
     @Args('id', { type: () => Int }) id: number,
   ): Promise<PartnerResponse> {
@@ -74,7 +74,7 @@ export class PartnerResolver {
   }
 
   @Mutation(() => PartnerResponse)
-  @Auth(Role.ADMIN, Role.MANAGER)
+  @Auth(Role.VENDOR)
   async deletePartner (
     @Args('id', { type: () => Int }) id: number,
   ): Promise<PartnerResponse> {

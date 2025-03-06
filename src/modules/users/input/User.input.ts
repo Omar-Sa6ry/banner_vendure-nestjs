@@ -7,3 +7,39 @@ export class UserInputResponse extends BaseResponse {
   @Field(() => User, { nullable: true })
   data: User
 }
+
+@InputType()
+export class UserInput {
+  @Field(() => Int)
+  id: number
+
+  @Field(() => String)
+  userName: string
+
+  @Field(() => String)
+  bio: string
+
+  @Field(() => String)
+  phone: string
+
+  @Field(() => String)
+  email: string
+}
+
+@ObjectType()
+export class UserOutput {
+  @Field(() => Int)
+  id: number
+
+  @Field(() => String)
+  userName: string
+
+  @Field(() => String)
+  bio: string
+
+  @Field(() => String)
+  phone: string
+
+  @Field(() => String)
+  email: string
+}

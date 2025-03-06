@@ -11,6 +11,8 @@ docker-compose.yml
 .dockerignore
 Dockerfile
 
+/api
+
 # Logs
 logs
 *.log

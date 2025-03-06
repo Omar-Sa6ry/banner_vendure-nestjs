@@ -24,7 +24,7 @@ export class CampaignLoader {
 
         const userIds = [...new Set(campaigns.map(campaign => campaign.userId))]
         const users = await this.userRepo.findAll({
-          where: { campaignId: { [Op.in]: userIds } },
+          where: { id: { [Op.in]: userIds } },
         })
         const userMap = new Map(users.map(user => [user.id, user]))
 
@@ -36,7 +36,7 @@ export class CampaignLoader {
           const user = userMap.get(campaign.userId)
           if (!user) throw new NotFoundException(this.i18n.t('user.NOT_FOUND'))
 
-          return { ...campaign, user }
+          return { ...campaign.dataValues, user: user.dataValues }
         })
       },
     )

@@ -8,12 +8,14 @@ import { Banner } from 'src/modules/banner/entity/bannner.entity'
 import { InjectModel } from '@nestjs/sequelize'
 import { Op } from 'sequelize'
 import { InterActionType } from 'src/common/constant/enum.constant'
+import { Partner } from 'src/modules/partner/entity/partner.entity'
 
 @Injectable()
 export class InteractionLoader {
   private loader: DataLoader<number, InteractionInput>
 
   constructor (
+    @InjectModel(Partner) private partnerRepo: typeof Partner,
     @InjectModel(Banner) private bannerRepo: typeof Banner,
     @InjectModel(User) private userRepo: typeof User,
     @InjectModel(Campaign) private campaignRepo: typeof Campaign,
@@ -47,7 +49,7 @@ export class InteractionLoader {
         )
 
         const createdByIds = [...new Set(banners.map(i => i.createdBy))]
-        const createdBys = await this.userRepo.findAll({
+        const createdBys = await this.partnerRepo.findAll({
           where: { id: { [Op.in]: createdByIds } },
         })
         const createdByMap = new Map(

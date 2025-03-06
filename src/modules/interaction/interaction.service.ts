@@ -17,6 +17,7 @@ import {
   InteractionInputResponse,
   InteractionsInputResponse,
 } from './input/interaction.input'
+import { Partner } from '../partner/entity/partner.entity'
 
 @Injectable()
 export class InteractionService {
@@ -29,6 +30,7 @@ export class InteractionService {
     @InjectModel(Banner) private bannerRepo: typeof Banner,
     @InjectModel(User) private userRepo: typeof User,
     @InjectModel(Interaction) private interactionRepo: typeof Interaction,
+    @InjectModel(Partner) private partnerRepo: typeof Partner,
   ) {}
 
   async create (
@@ -64,7 +66,7 @@ export class InteractionService {
         { transaction },
       )
 
-      const createdBy = await this.userRepo.findByPk(banner.createdBy, {
+      const createdBy = await this.partnerRepo.findByPk(banner.createdBy, {
         transaction,
       })
       if (!createdBy)
@@ -121,7 +123,7 @@ export class InteractionService {
     const user = await this.userRepo.findByPk(interaction.userId)
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
-    const createdBy = await this.userRepo.findByPk(banner.createdBy)
+    const createdBy = await this.partnerRepo.findByPk(banner.createdBy)
     if (!createdBy)
       throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 

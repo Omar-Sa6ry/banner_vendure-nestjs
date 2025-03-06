@@ -27,7 +27,7 @@ export class FollowLoader {
           ...new Set(follows.map(follow => follow.followingId)),
         ]
         const users = await this.userRepo.findAll({
-          where: { FollowId: { [Op.in]: userIds } },
+          where: { id: { [Op.in]: userIds } },
         })
         const userMap = new Map(users.map(user => [user.id, user]))
 

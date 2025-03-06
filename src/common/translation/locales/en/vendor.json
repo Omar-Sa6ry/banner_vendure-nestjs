@@ -1,0 +1,7 @@
+{
+  "CREATED": "Vendor created successfully",
+  "UPDATED": "Vendor updated successfully",
+  "DELETED": "Vendor deleted successfully",
+  "NOT_FOUND": "Vendor not found",
+  "NOT_FOUNDS": "Vendors not found"
+}

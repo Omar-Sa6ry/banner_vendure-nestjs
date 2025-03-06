@@ -9,18 +9,16 @@ import { CampaignDto } from './dtos/Campaign.dto'
 import { Auth } from 'src/common/decerator/auth.decerator'
 import { Role } from 'src/common/constant/enum.constant'
 import { CampaignResponse, CampaignsResponse } from './dtos/CampaignResponse'
-import { I18nService } from 'nestjs-i18n'
 
 @Resolver(() => Campaign)
 export class CampaignResolver {
   constructor (
     private readonly redisService: RedisService,
-    private readonly i18n: I18nService,
     private readonly campaignService: CampaignService,
   ) {}
 
   @Mutation(() => CampaignResponse)
-  @Auth(Role.ADMIN, Role.MANAGER)
+  @Auth(Role.VENDOR)
   async createCampaign (
     @Args('createCampaignDto') createCampaignDto: CreateCampaignCDto,
     @CurrentUser() user: CurrentUserDto,
@@ -29,7 +27,7 @@ export class CampaignResolver {
   }
 
   @Query(() => CampaignResponse)
-  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCampaignById (
     @Context() context,
     @Args('id', { type: () => Int }) id: number,
@@ -44,9 +42,9 @@ export class CampaignResolver {
   }
 
   @Query(() => CampaignsResponse)
-  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getCampaigns (
-    @Args('campaignDto') campaignDto: CampaignDto,
+    @Args('campaignDto', { nullable: true }) campaignDto?: CampaignDto,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
   ): Promise<CampaignsResponse> {
@@ -54,7 +52,7 @@ export class CampaignResolver {
   }
 
   @Query(() => CampaignsResponse)
-  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
   async getListCampaigns (
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
@@ -63,7 +61,7 @@ export class CampaignResolver {
   }
 
   @Mutation(() => CampaignResponse)
-  @Auth(Role.USER, Role.PARTNER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.VENDOR)
   async UpdateCampaign (
     @Args('id', { type: () => Int }) id: number,
     @Args('updateCampaignDto') updateCampaignDto: CampaignDto,
@@ -72,7 +70,7 @@ export class CampaignResolver {
   }
 
   @Mutation(() => CampaignResponse)
-  @Auth(Role.ADMIN, Role.MANAGER)
+  @Auth(Role.VENDOR)
   async deleteCampaign (
     @Args('id', { type: () => Int }) id: number,
   ): Promise<CampaignResponse> {

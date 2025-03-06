@@ -20,7 +20,11 @@ import {
     { name: 'idx_interaction_user_id', fields: ['userId'] },
     { name: 'idx_interaction_banner_id', fields: ['bannerId'] },
     { name: 'idx_interaction_type', fields: ['type'] },
-    { name: 'idx_interaction_user_banner', fields: ['userId', 'bannerId'] },
+    {
+      name: 'idx_interaction_user_banner_type',
+      unique: true,
+      fields: ['userId', 'bannerId', 'type'],
+    },
   ],
 })
 export class Interaction extends Model<Interaction> {

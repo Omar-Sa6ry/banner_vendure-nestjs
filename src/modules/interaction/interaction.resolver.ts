@@ -25,7 +25,7 @@ export class InteractionResolver {
   ) {}
 
   @Mutation(() => InteractionResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async createInteraction (
     @CurrentUser() user: CurrentUserDto,
     @Args('data') data: CreateInteractionDto,
@@ -34,7 +34,7 @@ export class InteractionResolver {
   }
 
   @Query(() => InteractionResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async getInteractionById (
     @Args('id', { type: () => Int }) id: number,
   ): Promise<InteractionResponse> {
@@ -77,7 +77,7 @@ export class InteractionResolver {
   }
 
   @Query(() => InteractionsResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async getUserInteractions (
     @CurrentUser() user: CurrentUserDto,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
@@ -93,7 +93,7 @@ export class InteractionResolver {
   }
 
   @Query(() => InteractionResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async countAdViews (
     @Args('adId', { type: () => Int }) adId: number,
   ): Promise<InteractionResponse> {
@@ -101,7 +101,7 @@ export class InteractionResolver {
   }
 
   @Query(() => InteractionResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async countAdCkicks (
     @Args('adId', { type: () => Int }) adId: number,
   ): Promise<InteractionResponse> {
@@ -109,7 +109,7 @@ export class InteractionResolver {
   }
 
   @Query(() => InteractionsResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async getMostViews (
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
   ): Promise<InteractionsResponse> {
@@ -117,7 +117,7 @@ export class InteractionResolver {
   }
 
   @Query(() => InteractionsResponse)
-  @Auth(Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async getMostClicks (
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
   ): Promise<InteractionsResponse> {

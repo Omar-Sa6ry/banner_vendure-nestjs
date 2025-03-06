@@ -15,6 +15,7 @@ import {
 } from 'sequelize-typescript'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Banner } from 'src/modules/banner/entity/bannner.entity'
+import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
 
 @ObjectType()
 @Table({
@@ -84,4 +85,7 @@ export class Campaign extends Model<Campaign> {
 
   @HasMany(() => Partner)
   partners: Partner[]
+
+  @HasMany(() => Vendor)
+  vendors: Vendor[]
 }

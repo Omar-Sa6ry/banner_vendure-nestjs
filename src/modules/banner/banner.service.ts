@@ -50,9 +50,6 @@ export class BannerService {
   ): Promise<BannerInputResponse> {
     const user = await this.userRepo.findByPk(userId)
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
-    if (user.role !== Role.PARTNER) {
-      throw new BadRequestException(await this.i18n.t('user.ROLE'))
-    }
 
     const campaign = await (
       await this.campaignService.getCampainById(createBannerDto.campaignId)
@@ -74,19 +71,20 @@ export class BannerService {
     try {
       const banner = await this.bannerRepo.create(
         {
-          ...createBannerDto,
-          createdBy: userId,
           image_ar,
           image_en,
+          createdBy: partner.id,
+          ...createBannerDto,
         },
         { transaction },
       )
 
+      console.log('mkjij', banner.dataValues)
       const data: BannerInput = {
-        ...banner,
+        ...banner.dataValues,
         views: 0,
         clicks: 0,
-        createdBy: user,
+        createdBy: partner.dataValues,
         campaign,
       }
 
@@ -95,6 +93,8 @@ export class BannerService {
         statusCode: 201,
         message: await this.i18n.t('banner.CREATED'),
       }
+
+      await transaction.commit()
 
       const relationCacheKey = `banner:${banner.id}`
       await this.redisService.set(relationCacheKey, result)
@@ -116,11 +116,11 @@ export class BannerService {
     if (!banner)
       throw new NotFoundException(await this.i18n.t('banner.NOT_FOUND'))
 
-    const user = await this.userRepo.findByPk(banner.createdBy)
-    if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
-    if (user.role !== Role.PARTNER) {
-      throw new BadRequestException(await this.i18n.t('user.ROLE'))
-    }
+    const partner = await this.partnerRepo.findOne({
+      where: { id: banner.createdBy },
+    })
+    if (!partner)
+      throw new NotFoundException(await this.i18n.t('partner.NOT_FOUND'))
 
     const campaign = await (
       await this.campaignService.getCampainById(banner.campaignId)
@@ -129,6 +129,11 @@ export class BannerService {
       throw new NotFoundException(await this.i18n.t('campaign.NOT_FOUND'))
 
     if (userId) {
+      await this.interactionService.create(userId, {
+        type: InterActionType.VIEW,
+        bannerId: banner.id,
+      })
+
       await this.interactionService.create(userId, {
         type: InterActionType.CLICK,
         bannerId: banner.id,
@@ -139,7 +144,13 @@ export class BannerService {
       ?.message
 
     const result: BannerInputResponse = {
-      data: { ...banner, views, clicks, campaign, createdBy: user },
+      data: {
+        ...banner.dataValues,
+        views,
+        clicks,
+        campaign,
+        createdBy: partner,
+      },
     }
 
     const relationCacheKey = `banner:${banner.id}`
@@ -160,7 +171,7 @@ export class BannerService {
 
     const { rows: data, count: total } = await this.bannerRepo.findAndCountAll({
       where: { campaignId },
-      order: [['score', 'DESC']],
+      order: [['createdAt', 'DESC']],
       offset: (page - 1) * limit,
       limit,
     })
@@ -196,7 +207,7 @@ export class BannerService {
     limit: number = Limit,
   ): Promise<BannersInputResponse> {
     const { rows: data, count: total } = await this.bannerRepo.findAndCountAll({
-      order: [['score', 'DESC']],
+      order: [['createdAt', 'DESC']],
       offset: (page - 1) * limit,
       limit,
     })

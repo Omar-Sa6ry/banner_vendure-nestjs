@@ -12,7 +12,7 @@ import {
 export class GeneralResponseInterceptor<T> implements NestInterceptor<T, any> {
   intercept (context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map(data => {
+      map((data: any) => {
         return {
           success: true,
           statusCode: data?.statusCode || 200,
@@ -32,8 +32,12 @@ export class GeneralResponseInterceptor<T> implements NestInterceptor<T, any> {
             new GraphQLError(error.message || 'An error occurred', {
               extensions: {
                 success: false,
-                statusCode: error?.status || 500,
-                message: error?.message || 'An error occurred',
+                statusCode: error?.response?.statusCode || error?.status || 500,
+                message:
+                  error?.errors?.map(err => err?.message) ||
+                  error?.response?.message ||
+                  error?.extensions?.message ||
+                  'An error occurred',
                 timeStamp: new Date().toISOString().split('T')[0],
                 error: error?.response?.error || 'Unknown error',
               },

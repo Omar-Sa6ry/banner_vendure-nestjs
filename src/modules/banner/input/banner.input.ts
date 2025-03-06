@@ -3,21 +3,27 @@ import { Expose } from 'class-transformer'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { IsOptional } from 'class-validator'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
-import { User } from 'src/modules/users/entity/user.entity'
 import { CampaignInput } from 'src/modules/campaign/input/campain.input'
+import { Partner } from 'src/modules/partner/entity/partner.entity'
 
 @InputType()
 export class BannerInput {
   @Field(() => Int)
+  id: number
+
+  @Field(() => Int)
   position: number
+
+  @Field(() => Int)
+  price: number
 
   @Field(() => Int)
   page: number
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   clicks: number
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   views: number
 
   @Field(() => String)
@@ -33,7 +39,7 @@ export class BannerInput {
   image_en: string
 
   @IsOptional()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   redirect?: string
 
   @Field(() => Boolean)
@@ -42,8 +48,8 @@ export class BannerInput {
   @Field(() => Date)
   createdAt: Date
 
-  @Field(() => User)
-  createdBy: User
+  @Field(() => Partner)
+  createdBy: Partner
 
   @Field(() => CampaignInput)
   campaign: CampaignInput

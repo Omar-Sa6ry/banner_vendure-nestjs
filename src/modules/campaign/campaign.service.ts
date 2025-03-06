@@ -61,9 +61,11 @@ export class CampaignService {
       await transaction.commit()
 
       const data: CampaignInput = {
-        ...campaign,
+        ...campaign.dataValues,
         user,
       }
+
+      console.log(data)
       return {
         data,
         statusCode: 201,
@@ -87,7 +89,9 @@ export class CampaignService {
     })
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
-    const result: CampaignInputResponse = { data: { ...campaign, user } }
+    const result: CampaignInputResponse = {
+      data: { ...campaign.dataValues, user },
+    }
 
     const relationCacheKey = `campaign:${campaign.id}`
     await this.redisService.set(relationCacheKey, result)
@@ -96,7 +100,7 @@ export class CampaignService {
   }
 
   async getCampaign (
-    CampaignDto: CampaignDto,
+    CampaignDto?: CampaignDto,
     page: number = Page,
     limit: number = Limit,
   ): Promise<CampaignsInputResponse> {
@@ -174,7 +178,9 @@ export class CampaignService {
     })
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
-    const result: CampaignInputResponse = { data: { ...campaign, user } }
+    const result: CampaignInputResponse = {
+      data: { ...campaign, user },
+    }
 
     await this.campaignRepo.update(updateCampaignDto, {
       where: { id },
@@ -199,7 +205,7 @@ export class CampaignService {
 
     return {
       message: await this.i18n.t('campaign.UPDATED'),
-      data: { user: campaign.user, ...campaign },
+      data: { user: campaign.user, ...campaign, ...updateCampaignDto },
     }
   }
 

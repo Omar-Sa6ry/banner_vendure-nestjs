@@ -3,9 +3,9 @@ import { Expose } from 'class-transformer'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { IsInt, IsOptional } from 'class-validator'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
-import { User } from 'src/modules/users/entity/user.entity'
 import { BannerOutput } from 'src/modules/banner/dtos/banner.response'
-import { BannerInput } from 'src/modules/banner/input/banner.input'
+import { InterActionType } from 'src/common/constant/enum.constant'
+import { User } from 'src/modules/users/entity/user.entity'
 
 @ObjectType()
 export class InteractionOutput {
@@ -13,14 +13,14 @@ export class InteractionOutput {
   @IsInt()
   id: number
 
-  @Field(() => String)
-  type: string
+  @Field(() => InterActionType)
+  type: InterActionType
 
   @Field(() => User)
   user: User
 
   @Field(() => BannerOutput)
-  banner: BannerInput
+  banner: BannerOutput
 
   @Field()
   createdAt: Date

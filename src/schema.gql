@@ -2,19 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
-  id: Int!
-  userName: String!
-  avatar: String!
-  bio: String!
-  phone: String!
-  email: String!
-}
-
 type Post {
   id: Int!
-  imageUrl: String!
   content: String!
+  bannerId: Int!
   userId: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -24,6 +15,65 @@ type Post {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type User {
+  id: Int!
+  userName: String!
+  avatar: String!
+  bio: String!
+  phone: String!
+  email: String!
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Campaign {
+  id: Int!
+  name: String!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  status: String!
+  userId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type Partner {
+  id: Int!
+  campaignId: Int!
+  userId: Int!
+  createdAt: DateTime!
+}
+
+type Banner {
+  id: Int!
+  createdBy: Int!
+  campaignId: Int!
+  position: Int!
+  page: Int!
+  price: Int!
+  image_ar: String!
+  image_en: String!
+  redirect: String!
+  url_ar: String!
+  url_en: String!
+  isActive: Boolean!
+  score: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Comment {
+  id: Int!
+  content: String!
+  postId: Int!
+  userId: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
 
 type AuthOutPut {
   user: User!
@@ -52,11 +102,13 @@ type PaginationInfo {
   totalItems: Int!
 }
 
-type PostInput {
+type PostOutput {
   id: Float!
   content: String!
-  imageUrl: String!
+  banner: Banner!
   user: User!
+  likes: Int!
+  comments: [Comment!]
   createdAt: DateTime!
 }
 
@@ -65,7 +117,7 @@ type PostsResponse {
   success: Boolean
   timeStamp: String
   statusCode: Float
-  items: [PostInput!]
+  items: [PostOutput!]
   pagination: PaginationInfo
 }
 
@@ -74,13 +126,37 @@ type PostResponse {
   success: Boolean
   timeStamp: String
   statusCode: Float
-  data: PostInput
+  data: PostOutput
+}
+
+type LikeOutput {
+  id: Float!
+  post: PostOutput!
+  user: User!
+  createdAt: DateTime!
+}
+
+type LikesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [LikeOutput!]
+  pagination: PaginationInfo
+}
+
+type LikeResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: LikeOutput
 }
 
 type CommentOutput {
   id: Float!
   content: String!
-  post: Post!
+  post: PostOutput!
   user: User!
   createdAt: DateTime!
 }
@@ -102,14 +178,268 @@ type CommentResponse {
   data: CommentOutput
 }
 
+type CampaignOutput {
+  id: Int!
+  name: String!
+  description: String!
+  status: CampaignStatus!
+  startDate: DateTime!
+  endDate: DateTime!
+  createdAt: DateTime!
+  user: User!
+}
+
+"""Campaign lifecycle statuses"""
+enum CampaignStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+type CampaignsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [CampaignOutput!]
+  pagination: PaginationInfo
+}
+
+type CampaignResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: CampaignOutput
+}
+
+type partnerOutput {
+  id: Int!
+  createdAt: DateTime!
+  campaign: Campaign!
+  user: User!
+}
+
+type PartnersResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [partnerOutput!]
+  pagination: PaginationInfo
+}
+
+type PartnerResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: partnerOutput
+}
+
+type BannerOutput {
+  id: Int!
+  position: Int!
+  price: Int!
+  page: Int!
+  clicks: Int!
+  views: Int!
+  url_ar: String!
+  url_en: String!
+  image_ar: String!
+  image_en: String!
+  redirect: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  createdBy: Partner!
+  campaign: CampaignOutput!
+}
+
+type BannersResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [BannerOutput!]
+  pagination: PaginationInfo
+}
+
+type BannerResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: BannerOutput
+}
+
+type InteractionOutput {
+  id: Float!
+  type: InterActionType!
+  user: User!
+  banner: BannerOutput!
+  createdAt: DateTime!
+}
+
+"""Types of interactions"""
+enum InterActionType {
+  VIEW
+  CLICK
+}
+
+type InteractionsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [InteractionOutput!]
+  pagination: PaginationInfo
+}
+
+type InteractionResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: InteractionOutput
+}
+
+type FollowOutput {
+  id: Int!
+  createdAt: DateTime!
+  follower: User!
+  following: User!
+  status: String!
+}
+
+type FollowsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [FollowOutput!]
+  pagination: PaginationInfo
+}
+
+type FollowResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: FollowOutput
+}
+
+type VendorOutput {
+  id: Float!
+  banner: Banner!
+  user: User!
+  campaign: Campaign!
+  createdAt: DateTime!
+}
+
+type VendorsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [VendorOutput!]
+  pagination: PaginationInfo
+}
+
+type VendorResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: VendorOutput
+}
+
+type CreateBuyer {
+  id: Int!
+  paymentMethod: String!
+  createdAt: DateTime!
+  user: User!
+  banner: Banner!
+  session: String
+}
+
+type CreateBuyerResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: CreateBuyer
+}
+
+type BuyerOutput {
+  id: Int!
+  paymentMethod: String!
+  createdAt: DateTime!
+  user: User!
+  banner: Banner!
+}
+
+type BuyersResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [BuyerOutput!]
+  pagination: PaginationInfo
+}
+
+type BuyerResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: BuyerOutput
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
   getUserByEmail(email: String!): UserResponse!
   getUserByUserName(userName: String!): UserResponse!
+  deleteUser: UserResponse!
+  getVendorById(id: Int!): VendorResponse!
+  getVendors(page: Int, limit: Int): VendorsResponse!
+  getBannerVendor(bannerId: Int!): UserResponse!
+  getUserVendor(userId: Int!, page: Int, limit: Int): VendorsResponse!
+  getBuyer(id: Int!): BuyerResponse!
+  getAllBuyers(page: Int, limit: Int): BuyersResponse!
+  getBuyersByBannerId(bannerId: Int!, page: Int, limit: Int): BuyersResponse!
+  getBuyersByUserId(userId: Int!, page: Int, limit: Int): BuyersResponse!
+  getRelationStatus(followingId: Float!): FollowResponse!
+  getFollowers(followerId: Float!, page: Int, limit: Int): FollowsResponse!
+  getFollowings(followingId: Float!, page: Int, limit: Int): FollowsResponse!
+  getFriends(page: Int, limit: Int): FollowsResponse!
+  getCampaignById(id: Int!): CampaignResponse!
+  getCampaigns(campaignDto: CampaignDto, page: Int, limit: Int): CampaignsResponse!
+  getListCampaigns(page: Int, limit: Int): CampaignsResponse!
+  getPartnerById(id: Int!): PartnerResponse!
+  partnersByCampaign(campaignId: Int!, page: Int, limit: Int): PartnersResponse!
+  partnersByUser(userId: Int!, page: Int, limit: Int): PartnersResponse!
+  getInteractionById(id: Int!): InteractionResponse!
+  getInteractions(page: Int, limit: Int): InteractionsResponse!
+  getUserInteractionsByAdmin(userId: Int!, page: Int, limit: Int): InteractionsResponse!
+  getUserInteractions(page: Int, limit: Int): InteractionsResponse!
+  countAdViews(adId: Int!): InteractionResponse!
+  countAdCkicks(adId: Int!): InteractionResponse!
+  getMostViews(limit: Int): InteractionsResponse!
+  getMostClicks(limit: Int): InteractionsResponse!
+  bannerById(id: Int!): BannerResponse!
+  bannersByCampaign(campaignId: Int!, page: Int, limit: Int): BannersResponse!
+  getBanners(page: Int, limit: Int): BannersResponse!
   getPostById(id: Int!): PostResponse!
   searchPosts(content: String, page: Int, limit: Int): PostsResponse!
   getUserPosts: PostsResponse!
+  likedUser(page: Int, limit: Int): LikesResponse!
+  postLikeCount(postId: Int!): LikeResponse!
   getCommentById(id: Int!): CommentResponse!
   getComment(postId: Int!, content: String!): CommentResponse!
   getCommentsForPost(postId: Int!, page: Int, limit: Int): CommentsResponse!
@@ -120,19 +450,47 @@ type Query {
   getPostByComment(commentId: Int!): Post!
 }
 
+input CampaignDto {
+  name: String
+  description: String
+  startDate: DateTime
+  endDate: DateTime
+  createdAt: DateTime
+}
+
 type Mutation {
-  register(fcmToken: String!, createUserDto: CreateUserDto!): AuthResponse!
+  register(fcmToken: String!, createUserDto: CreateUserDto!, avatar: CreateImagDto): AuthResponse!
   login(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
-  forgotPassword(email: String!): String!
-  resetPassword(resetPasswordDto: ResetPasswordDto!): String!
-  changePassword(changePasswordDto: ChangePasswordDto!): String!
+  forgotPassword: AuthResponse!
+  resetPassword(resetPasswordDto: ResetPasswordDto!): AuthResponse!
+  changePassword(changePasswordDto: ChangePasswordDto!): AuthResponse!
   adminLogin(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
+  partnerLogin(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
   managerLogin(fcmToken: String!, loginDto: LoginDto!): AuthResponse!
   logout: Boolean!
   updateUser(updateUserDto: UpdateUserDto!): UserResponse!
-  createPost(content: String!, image: CreateImagDto!): PostResponse!
+  UpdateUserRole(email: String!): String!
+  createVendor(bannerId: Int!, campaignId: Int!, userId: Int!): VendorResponse!
+  deleteVendor(id: Int!): VendorResponse!
+  createBuyer(bannerId: Int!): CreateBuyerResponse!
+  deleteBuyer(id: Int!): BuyerResponse!
+  followUser(followingId: Float!): FollowResponse!
+  unfollowingUser(followerId: Float!): FollowResponse!
+  acceptFollowRequest(followingId: Float!, status: Boolean!): FollowResponse!
+  createCampaign(createCampaignDto: CreateCampaignCDto!): CampaignResponse!
+  UpdateCampaign(id: Int!, updateCampaignDto: CampaignDto!): CampaignResponse!
+  deleteCampaign(id: Int!): CampaignResponse!
+  addPartner(campaignId: Int!, userId: Int!): PartnerResponse!
+  deletePartner(id: Int!): PartnerResponse!
+  createInteraction(data: CreateInteractionDto!): InteractionResponse!
+  createBanner(createBannerDto: CreateBannerDto!, imageAr: CreateImagDto!, imageEn: CreateImagDto!): BannerResponse!
+  updateBanner(id: Int!, campaignId: Int!, updateBannerDto: UpdateBannerDto!): BannerResponse!
+  deleteBanner(id: Int!, campaignId: Int!): BannerResponse!
+  createPost(content: String!, bannerId: Int!): PostResponse!
   updatePost(id: Int!, content: String!): PostResponse!
   deletePost(id: Int!): PostResponse!
+  likePost(postId: Int!): LikeResponse!
+  unlikePost(postId: Int!): String!
   writeComment(postId: Int!, content: String!): CommentResponse!
   updateComment(commentId: Int!, content: String!): CommentResponse!
   deleteComment(commentId: Int!): CommentResponse!
@@ -141,9 +499,19 @@ type Mutation {
 input CreateUserDto {
   userName: String!
   email: String!
+  bio: String
   password: String!
   phone: String!
 }
+
+input CreateImagDto {
+  name: String
+  breed: String
+  image: Upload!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input LoginDto {
   email: String!
@@ -167,11 +535,35 @@ input UpdateUserDto {
   phone: String
 }
 
-input CreateImagDto {
+input CreateCampaignCDto {
   name: String!
-  breed: String!
-  image: Upload!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
+input CreateInteractionDto {
+  type: InterActionType!
+  bannerId: Int!
+}
+
+input CreateBannerDto {
+  campaignId: Int!
+  position: Int!
+  page: Int!
+  price: Int!
+  url_ar: String!
+  url_en: String!
+  redirect: String
+  isActive: Boolean!
+}
+
+input UpdateBannerDto {
+  position: Int
+  price: Int!
+  page: Int
+  url_ar: String
+  url_en: String
+  redirect: String
+  isActive: Boolean
+}

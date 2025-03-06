@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { Partner } from './entity/partner.entity'
 import { Campaign } from '../campaign/entity/campaign.entity'
+import { Role } from 'src/common/constant/enum.constant'
 import { User } from '../users/entity/user.entity'
 import { I18nService } from 'nestjs-i18n'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
@@ -27,11 +28,11 @@ export class PartnerService {
   ) {}
 
   async add (campaignId: number, userId: number): Promise<PartnerInputResponse> {
-    const campaign = await this.campaignRepo.findByPk(campaignId)
+    const campaign = (await this.campaignRepo.findByPk(campaignId))?.dataValues
     if (!campaign)
       throw new NotFoundException(await this.i18n.t('campaign.NOT_FOUND'))
 
-    const user = await this.userRepo.findByPk(userId)
+    const user = await (await this.userRepo.findByPk(userId))?.dataValues
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
     const transaction = await this.campaignRepo.sequelize.transaction()
@@ -44,9 +45,11 @@ export class PartnerService {
         },
         { transaction },
       )
+      user.role = Role.PARTNER
+      user.save()
       partner.save()
 
-      const data: partnerInput = { ...partner, user, campaign }
+      const data: partnerInput = { ...partner.dataValues, user, campaign }
 
       const relationCacheKey = `partner:${partner.id}`
       await this.redisService.set(relationCacheKey, data)
@@ -81,7 +84,11 @@ export class PartnerService {
     const user = await this.userRepo.findByPk(partner.userId)
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
-    const data: partnerInput = { ...partner, user, campaign }
+    const data: partnerInput = {
+      ...partner.dataValues,
+      user: user.dataValues,
+      campaign: campaign.dataValues,
+    }
 
     const relationCacheKey = `partner:${partner.id}`
     await this.redisService.set(relationCacheKey, data)
@@ -89,7 +96,6 @@ export class PartnerService {
     return {
       data,
       statusCode: 201,
-      message: await this.i18n.t('partner.CREATED'),
     }
   }
 
@@ -182,6 +188,6 @@ export class PartnerService {
       partner,
     })
 
-    return { message: await this.i18n.t('campaign.NOT_FOUNDS'), data: null }
+    return { message: await this.i18n.t('campaign.DELETED'), data: null }
   }
 }

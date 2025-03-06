@@ -19,7 +19,7 @@ export class BannerResolver {
   ) {}
 
   @Mutation(() => BannerResponse)
-  @Auth(Role.PARTNER)
+  @Auth(Role.PARTNER, Role.VENDOR)
   async createBanner (
     @CurrentUser() user: CurrentUserDto,
     @Args('createBannerDto') createBannerDto: CreateBannerDto,
@@ -35,7 +35,7 @@ export class BannerResolver {
   }
 
   @Query(() => BannerResponse)
-  @Auth(Role.PARTNER, Role.USER, Role.ADMIN, Role.MANAGER)
+  @Auth(Role.PARTNER, Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async bannerById (
     @CurrentUser() user: CurrentUserDto,
     @Args('id', { type: () => Int }) id: number,
@@ -50,6 +50,7 @@ export class BannerResolver {
   }
 
   @Query(() => BannersResponse)
+  @Auth(Role.PARTNER, Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async bannersByCampaign (
     @CurrentUser() user: CurrentUserDto,
     @Args('campaignId', { type: () => Int }) campaignId: number,
@@ -71,6 +72,7 @@ export class BannerResolver {
   }
 
   @Query(() => BannersResponse)
+  @Auth(Role.PARTNER, Role.USER, Role.VENDOR, Role.ADMIN, Role.MANAGER)
   async getBanners (
     @CurrentUser() user: CurrentUserDto,
     @Args('page', { type: () => Int, nullable: true }) page?: number,

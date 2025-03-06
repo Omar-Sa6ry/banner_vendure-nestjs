@@ -13,11 +13,15 @@ import {
   DataType,
   Index,
   HasMany,
+  CreatedAt,
+  UpdatedAt,
 } from 'sequelize-typescript'
+import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
+import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
 
 @ObjectType()
-@Table({ timestamps: true })
-export class User extends Model {
+@Table({ tableName: 'user', timestamps: true })
+export class User extends Model<User> {
   @Field(() => Int)
   @Column({ autoIncrement: true, primaryKey: true })
   id: number
@@ -76,6 +80,14 @@ export class User extends Model {
   @Column({ type: DataType.STRING, allowNull: true })
   fcmToken?: string
 
+  @CreatedAt
+  @Field(() => Date)
+  createdAt: Date
+
+  @UpdatedAt
+  @Field(() => Date)
+  updatedAt: Date
+
   @HasMany(() => Campaign)
   campaign: Campaign[]
 
@@ -85,9 +97,15 @@ export class User extends Model {
   @HasMany(() => Interaction)
   interactions: Interaction[]
 
+  @HasMany(() => Vendor)
+  vendors: Vendor[]
+
   @HasMany(() => Post)
   posts: Post[]
 
   @HasMany(() => Like)
   likes: Like[]
+
+  @HasMany(() => Buyer)
+  buyers: Buyer[]
 }

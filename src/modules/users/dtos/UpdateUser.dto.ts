@@ -20,6 +20,6 @@ export class UpdateUserDto {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsPhoneNumber()
+  @IsPhoneNumber('EG')
   phone?: string
 }

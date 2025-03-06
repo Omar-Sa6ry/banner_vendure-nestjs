@@ -6,12 +6,12 @@ import { IsOptional } from 'class-validator'
 @InputType()
 export class CreateImagDto {
   @IsOptional()
-  @Field(() => String)
-  name: string
+  @Field(() => String, { nullable: true })
+  name?: string
 
   @IsOptional()
-  @Field(() => String)
-  breed: string
+  @Field(() => String, { nullable: true })
+  breed?: string
 
   @Field(() => GraphQLUpload)
   image: Promise<FileUpload>

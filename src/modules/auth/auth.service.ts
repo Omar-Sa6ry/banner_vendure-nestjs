@@ -43,25 +43,21 @@ export class AuthService {
     createUserDto: CreateUserDto,
     avatar?: CreateImagDto,
   ): Promise<AuthInputResponse> {
-    const { userName, phone, email } = createUserDto
+    const { email } = createUserDto
     if (!email.endsWith('@gmail.com'))
       throw new BadRequestException(await this.i18n.t('user.END_EMAIL'))
 
-    const existedEmail = await this.userService.findByEmail(email)
-    if (existedEmail)
-      throw new BadRequestException(await this.i18n.t('user.EMAIL_USED'))
-
     const transaction = await this.userRepo.sequelize.transaction()
     try {
+      const password = await HashPassword(createUserDto.password)
       const user = await this.userRepo.create(
         {
-          userName,
-          email,
-          phone,
-          password: await HashPassword(createUserDto.password),
+          ...createUserDto,
+          password,
         },
         { transaction },
       )
+      console.log('koko')
 
       if (avatar) {
         const filename = await this.uploadService.uploadImage(avatar)
@@ -73,21 +69,16 @@ export class AuthService {
       user.fcmToken = fcmToken
       await user.save({ transaction })
 
-      await this.sendEmailService.sendEmail(
-        email,
-        'Register in App',
-        `You registered successfully in the App`,
-      )
-
       const token = await this.generateToken.jwt(user?.email, user?.id)
 
       await transaction.commit()
 
       const result: AuthInputResponse = {
-        data: { user, token },
+        data: { user: user.dataValues, token },
         statusCode: 201,
         message: await this.i18n.t('user.CREATED'),
       }
+      console.log('koko', result)
 
       const relationCacheKey = `user:${user.id}`
       await this.redisService.set(relationCacheKey, user)
@@ -99,6 +90,12 @@ export class AuthService {
         userId: user.id,
         user,
       })
+
+      this.sendEmailService.sendEmail(
+        email,
+        'Register in App',
+        `You registered successfully in the App`,
+      )
 
       return result
     } catch (error) {
@@ -113,7 +110,9 @@ export class AuthService {
   ): Promise<AuthInputResponse> {
     const { email, password } = loginDto
 
-    let user = await this.userService.findByEmail(email.toLowerCase())
+    let user = await (
+      await this.userService.findByEmail(email.toLowerCase())
+    )?.data
     if (!(user instanceof User))
       throw new BadRequestException(await this.i18n.t('user.EMAIL_WRONG'))
 
@@ -125,7 +124,7 @@ export class AuthService {
     await user.save()
 
     const result: AuthInputResponse = {
-      data: { user, token },
+      data: { user: user.dataValues, token },
       statusCode: 201,
       message: await this.i18n.t('user.LOGIN'),
     }
@@ -141,7 +140,7 @@ export class AuthService {
 
   async forgotPassword (email: string): Promise<AuthInputResponse> {
     const lowerEmail = email.toLowerCase()
-    const user = await this.userService.findByEmail(lowerEmail)
+    const user = await (await this.userService.findByEmail(lowerEmail))?.data
     if (!(user instanceof User))
       throw new BadRequestException(await this.i18n.t('user.EMAIL_WRONG'))
 

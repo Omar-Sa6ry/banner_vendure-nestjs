@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql'
 import { IsInt, IsOptional } from 'class-validator'
+import { InterActionType } from 'src/common/constant/enum.constant'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
 import { BannerInput } from 'src/modules/banner/input/banner.input'
@@ -11,8 +12,8 @@ export class InteractionInput {
   @IsInt()
   id: number
 
-  @Field(() => String)
-  type: string
+  @Field(() => InterActionType)
+  type: InterActionType
 
   @Field(() => User)
   user: User

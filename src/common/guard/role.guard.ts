@@ -27,21 +27,22 @@ export class RoleGuard implements CanActivate {
     const request = ctx.req
 
     const token = await this.extractTokenFromHeader(request)
-    if (!token)
+    if (!token) {
       throw new UnauthorizedException(await this.i18n.t('user.NO_TOKEN'))
-
+    }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       })
 
       if (payload.id && payload.email) {
-        const user = await this.userService.findById(payload.id)
+        const user = (await this.userService.findById(payload.id))?.data
         if (!(user instanceof User)) {
           throw new NotFoundException(
             'User with id ' + payload.id + ' not found',
           )
         }
+
         const requiredRoles = await this.reflector.get<Role[]>(
           'roles',
           context.getHandler(),
@@ -50,6 +51,7 @@ export class RoleGuard implements CanActivate {
         if (requiredRoles && requiredRoles.includes(user.role)) {
           request['user'] = {
             id: payload.id,
+            email: payload.email,
           }
         } else {
           throw new UnauthorizedException(

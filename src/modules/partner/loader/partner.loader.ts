@@ -45,14 +45,14 @@ export class PartnerLoader {
           if (!partner)
             throw new NotFoundException(this.i18n.t('partner.NOT_FOUND'))
 
-          const user = userMap.get(partner.userId)
+          const user = userMap.get(partner.userId)?.dataValues
           if (!user) throw new NotFoundException(this.i18n.t('user.NOT_FOUND'))
 
-          const campaign = campaignMap.get(partner.campaignId)
+          const campaign = campaignMap.get(partner.campaignId)?.dataValues
           if (!campaign)
             throw new NotFoundException(this.i18n.t('campaign.NOT_FOUND'))
 
-          return { ...partner, user, campaign }
+          return { ...partner.dataValues, user, campaign }
         })
       },
     )

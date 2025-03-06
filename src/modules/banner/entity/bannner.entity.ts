@@ -1,4 +1,4 @@
-import { Field, Int } from '@nestjs/graphql'
+import { Field, ObjectType, Int } from '@nestjs/graphql'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Post } from 'src/modules/post/entity/post.entity '
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
@@ -13,9 +13,13 @@ import {
   UpdatedAt,
   DataType,
   HasMany,
+  HasOne,
+  Default,
 } from 'sequelize-typescript'
-import { InjectModel } from '@nestjs/sequelize'
+import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
+import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
 
+@ObjectType()
 @Table({
   tableName: 'banners',
   indexes: [
@@ -48,6 +52,10 @@ export class Banner extends Model<Banner> {
   @Column({ type: DataType.INTEGER, allowNull: false })
   @Field(() => Int)
   page: number
+
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  @Field(() => Int)
+  price: number
 
   @Column({ type: DataType.STRING, allowNull: false })
   @Field(() => String)
@@ -99,9 +107,15 @@ export class Banner extends Model<Banner> {
   @BelongsTo(() => Campaign, { onDelete: 'CASCADE' })
   campaign: Campaign
 
+  @HasOne(() => Vendor)
+  Vendor: Vendor[]
+
   @HasMany(() => Interaction)
   interactions: Interaction[]
 
+  @HasMany(() => Buyer)
+  buyers: Buyer[]
+
   @HasMany(() => Post)
-  postas: Post[]
+  posts: Post[]
 }

@@ -1,3 +1,5 @@
+import { Banner } from 'src/modules/banner/entity/bannner.entity'
+import { Int, Field, ObjectType } from '@nestjs/graphql'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { User } from 'src/modules/users/entity/user.entity'
 import {
@@ -10,24 +12,28 @@ import {
   DataType,
   HasMany,
 } from 'sequelize-typescript'
-import { Banner } from 'src/modules/banner/entity/bannner.entity'
 
+@ObjectType()
 @Table({
-  tableName: 'campaign_sponsors',
+  tableName: 'partners',
   timestamps: true,
 })
 export class Partner extends Model<Partner> {
+  @Field(() => Int)
   @Column({ autoIncrement: true, primaryKey: true })
   id: number
 
+  @Field(() => Int)
   @ForeignKey(() => Campaign)
   @Column({ type: DataType.INTEGER, allowNull: false })
   campaignId: number
 
+  @Field(() => Int)
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER, allowNull: false })
   userId: number
 
+  @Field(() => Date)
   @CreatedAt
   createdAt: Date
 
