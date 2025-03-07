@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
+import { Op } from 'sequelize'
 import { User } from '../users/entity/user.entity'
 import { Reply } from './entity/reply.entity'
 import { InjectModel } from '@nestjs/sequelize'
@@ -99,6 +100,37 @@ export class ReplyService {
     }
   }
 
+  async getId (id: number): Promise<ReplyInputResponse> {
+    const reply = await this.replyRepo.findOne({
+      where: {
+        id,
+      },
+    })
+
+    if (!reply)
+      throw new NotFoundException(await this.i18n.t('reply.NOT_FOUND'))
+
+    const comment = await this.commentRepo.findOne({
+      where: { id: reply.commentId },
+    })
+    const user = await this.userRepo.findOne({
+      where: { id: reply.userId },
+    })
+
+    const result: ReplyInputResponse = {
+      data: {
+        ...reply.dataValues,
+        comment: comment.dataValues,
+        user: user.dataValues,
+      },
+    }
+
+    const relationCacheKey = `reply:${reply.id}`
+    await this.redisService.set(relationCacheKey, result)
+
+    return result
+  }
+
   async getById (
     userId: number,
     commentId: number,
@@ -160,7 +192,7 @@ export class ReplyService {
     const result: ReplyInputResponse = {
       data: {
         ...reply.dataValues,
-        comment: comment.dataValues,
+        comment,
         user: user.dataValues,
       },
     }
@@ -206,6 +238,31 @@ export class ReplyService {
     await this.redisService.set(relationCacheKey, result)
 
     return result
+  }
+
+  async getAllByIds (commentsId: number[]): Promise<ReplysInputResponse> {
+    const data = await this.replyRepo.findAll({
+      where: { id: { [Op.in]: commentsId } },
+    })
+
+    if (data.length === 0)
+      throw new NotFoundException(await this.i18n.t('reply.NOT_FOUNDS'))
+
+    const replies = await this.replyLoader.loadMany(
+      data.map(reply => reply.id),
+    )
+
+    const items: ReplyInput[] = await Promise.all(
+      data.map(async (r, index) => {
+        const reply = replies[index]
+        if (!reply)
+          throw new NotFoundException(await this.i18n.t('reply.NOT_FOUND'))
+
+        return reply
+      }),
+    )
+
+    return { items }
   }
 
   async getCountCommentPost (commentId: number): Promise<ReplyInputResponse> {

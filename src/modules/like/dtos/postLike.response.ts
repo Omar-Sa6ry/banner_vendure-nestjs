@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql'
-import { Expose, Transform } from 'class-transformer'
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
+import { Expose } from 'class-transformer'
+import { IsDate, IsInt, IsOptional } from 'class-validator'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
 import { PostOutput } from 'src/modules/post/dto/PostResponse.dto'
@@ -8,41 +8,27 @@ import { PostInput } from 'src/modules/post/input/Post.input'
 import { User } from 'src/modules/users/entity/user.entity'
 
 @ObjectType()
-export class CommentOutput {
+export class PostLikeOutput {
   @Field()
   @IsInt()
-  @Expose()
   id: number
 
-  @Field({ nullable: true })
-  @Expose()
-  content: string
-
-  // @Field(() => Int, { nullable: true })
-  // likes: number
-
   @Field(() => PostOutput)
-  @Expose()
   post: PostInput
 
   @Field(() => User)
-  @Expose()
   user: User
 
   @Field()
   @IsDate()
-  @Expose()
-  @Transform(({ value }) => new Date(value).toLocaleString(), {
-    toClassOnly: true,
-  })
   createdAt: Date
 }
 
 @ObjectType()
-export class CommentsResponse extends BaseResponse {
-  @Field(() => [CommentOutput], { nullable: true })
+export class LikesResponse extends BaseResponse {
+  @Field(() => [PostLikeOutput], { nullable: true })
   @Expose()
-  items: CommentOutput[]
+  items: PostLikeOutput[]
 
   @IsOptional()
   @Field(() => PaginationInfo, { nullable: true })
@@ -51,8 +37,8 @@ export class CommentsResponse extends BaseResponse {
 }
 
 @ObjectType()
-export class CommentResponse extends BaseResponse {
-  @Field(() => CommentOutput, { nullable: true })
+export class LikeResponse extends BaseResponse {
+  @Field(() => PostLikeOutput, { nullable: true })
   @Expose()
-  data: CommentOutput
+  data: PostLikeOutput
 }

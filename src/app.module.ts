@@ -10,7 +10,6 @@ import { UserModule } from './modules/users/users.module'
 import { PostModule } from './modules/post/post.module'
 import { TranslationModule } from './common/translation/translation.module'
 import { CommentModule } from './modules/comment/comment.module'
-import { LikeModule } from './modules/like/like.module'
 import { CampaignModule } from './modules/campaign/campaign.module'
 import { PartnerModule } from './modules/partner/partner.module'
 import { BannerModule } from './modules/banner/banner.module'
@@ -19,6 +18,9 @@ import { FollowModule } from './modules/follow/follow.module'
 import { VendorModule } from './modules/vendour/vendor.module'
 import { BuyerModule } from './modules/buyer/buyer.module'
 import { ReplyModule } from './modules/reply/reply.module'
+import { PostLikeModule } from './modules/like/modules/postLike.module'
+import { CommentLikeModule } from './modules/like/modules/commentLike.module'
+import { ReplyLikeModule } from './modules/like/modules/replyLike.module'
 
 @Module({
   imports: [
@@ -40,7 +42,9 @@ import { ReplyModule } from './modules/reply/reply.module'
     PostModule,
     CommentModule,
     ReplyModule,
-    LikeModule,
+    PostLikeModule,
+    CommentLikeModule,
+    ReplyLikeModule,
   ],
 
   providers: [AppService, AppResolver],

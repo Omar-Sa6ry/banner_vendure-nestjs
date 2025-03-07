@@ -7,8 +7,10 @@ import {
   BelongsTo,
   DataType,
   CreatedAt,
+  HasMany,
 } from 'sequelize-typescript'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
+import { Like } from 'src/modules/like/entity/like.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 
 @ObjectType()
@@ -54,12 +56,12 @@ export class Reply extends Model<Reply> {
   @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User
 
+  @HasMany(() => Like, {foreignKey: 'replyId', onDelete: 'SET NULL' })
+  likes: Like[]
+
   // @HasMany(() => Hashtag, { foreignKey: 'replyId', onDelete: 'SET NULL' })
   // hashtags: Hashtag[]
 
   // @HasMany(() => Mention, { foreignKey: 'replyId', onDelete: 'SET NULL' })
   // mentionReply: Mention[]
-
-  // @HasMany(() => Like, { foreignKey: 'replyId', onDelete: 'SET NULL' })
-  // likeReply: Like[]
 }

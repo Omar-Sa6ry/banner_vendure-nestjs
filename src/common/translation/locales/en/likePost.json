@@ -1,0 +1,9 @@
+{
+  "CREATED": "Like on this post created successfully",
+  "UPDATED": "Like on this post updated successfully",
+  "DELETED": "Like on this post deleted successfully",
+  "EXIST": "Like is already existed",
+  "NOT_FOUND": "Like on this post not found",
+  "NOT_FOUNDS": "No Like on this posts found",
+  "LIKENOTEQUALUSERID": "Like on this post not found"
+}

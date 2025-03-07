@@ -1,0 +1,9 @@
+{
+  "CREATED": "Like on this comment created successfully",
+  "UPDATED": "Like on this comment updated successfully",
+  "DELETED": "Like on this comment deleted successfully",
+  "EXIST": "Like is already existed",
+  "NOT_FOUND": "Like on this comment not found",
+  "NOT_FOUNDS": "No Like on this comments found",
+  "LIKENOTEQUALUSERID": "Like on this comment not found"
+}

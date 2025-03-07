@@ -16,6 +16,9 @@ export class CommentInput {
   @IsString()
   content: string
 
+  // @Field(() => Int, { nullable: true })
+  // likes: number
+
   @Field(() => PostInput)
   post: PostInput
 

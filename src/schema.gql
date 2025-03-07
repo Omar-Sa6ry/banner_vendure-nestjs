@@ -120,7 +120,7 @@ type PostResponse {
   data: PostOutput
 }
 
-type LikeOutput {
+type PostLikeOutput {
   id: Float!
   post: PostOutput!
   user: User!
@@ -132,7 +132,7 @@ type LikesResponse {
   success: Boolean
   timeStamp: String
   statusCode: Float
-  items: [LikeOutput!]
+  items: [PostLikeOutput!]
   pagination: PaginationInfo
 }
 
@@ -141,7 +141,7 @@ type LikeResponse {
   success: Boolean
   timeStamp: String
   statusCode: Float
-  data: LikeOutput
+  data: PostLikeOutput
 }
 
 type CommentOutput {
@@ -416,6 +416,54 @@ type ReplyResponse {
   data: ReplyOutPut
 }
 
+type CommentLikeOutput {
+  id: Float!
+  comment: CommentOutput!
+  user: User!
+  createdAt: DateTime!
+}
+
+type CommentLikesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [CommentLikeOutput!]
+  pagination: PaginationInfo
+}
+
+type CommentLikeResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: CommentLikeOutput
+}
+
+type ReplyLikeOutput {
+  id: Float!
+  reply: ReplyOutPut!
+  user: User!
+  createdAt: DateTime!
+}
+
+type ReplyLikesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [ReplyLikeOutput!]
+  pagination: PaginationInfo
+}
+
+type ReplyLikeResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: ReplyLikeOutput
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
@@ -470,6 +518,8 @@ type Query {
   getRepliesByUser(page: Int, limit: Int): ReplysResponse!
   getLastReplies(commentId: Float!, page: Int, limit: Int): ReplysResponse!
   getUserByReply(id: Float!): UserResponse!
+  commnetLikedUser(page: Int, limit: Int): ReplyLikesResponse!
+  commentLikeCount(replyId: Int!): ReplyLikeResponse!
 }
 
 input CampaignDto {
@@ -512,13 +562,17 @@ type Mutation {
   updatePost(id: Int!, content: String!): PostResponse!
   deletePost(id: Int!): PostResponse!
   likePost(postId: Int!): LikeResponse!
-  unlikePost(postId: Int!): String!
+  unlikePost(postId: Int!): LikeResponse!
   writeComment(postId: Int!, content: String!): CommentResponse!
   updateComment(commentId: Int!, content: String!): CommentResponse!
   deleteComment(commentId: Int!): CommentResponse!
   writeReply(commentId: Float!, content: String!): ReplyResponse!
   updateReply(id: Float!, content: String!): ReplyResponse!
   deleteReply(id: Float!): ReplyResponse!
+  likeComment(commentId: Int!): CommentLikeResponse!
+  unlikeComment(commentId: Int!): CommentLikeResponse!
+  likeReply(replyId: Int!): ReplyLikeResponse!
+  unlikeReply(replyId: Int!): ReplyLikeResponse!
 }
 
 input CreateUserDto {

@@ -4,13 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { Comment } from './entity/comment.entity '
+import { PostLikeService } from '../like/services/postLike.service'
 import { User } from '../users/entity/user.entity'
 import { Post } from '../post/entity/post.entity '
 import { PostInputResponse } from '../post/input/Post.input'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
 import { InjectModel } from '@nestjs/sequelize'
 import { Banner } from '../banner/entity/bannner.entity'
-import { LikeService } from '../like/like.service'
 import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { I18nService } from 'nestjs-i18n'
 import { RedisService } from 'src/common/redis/redis.service'
@@ -32,7 +32,7 @@ export class CommentService {
     @InjectModel(User) private userRepo: typeof User,
     private readonly i18n: I18nService,
     private commentLoader: CommentLoader,
-    private readonly likeService: LikeService,
+    private readonly postLikeService: PostLikeService,
     private readonly redisService: RedisService,
     private readonly websocketGateway: WebSocketMessageGateway,
     private readonly notificationService: NotificationService,
@@ -69,7 +69,8 @@ export class CommentService {
         where: { postId: post.id },
       })
 
-      const likes = +(await this.likeService.numPostLikes(post.id)).message || 0
+      const likes =
+        +(await this.postLikeService.numPostLikes(post.id)).message || 0
       await transaction.commit()
 
       const userPost = (await this.userRepo.findByPk(post.userId))?.dataValues
@@ -138,7 +139,7 @@ export class CommentService {
     const comments = await this.commentRepo.findAll({
       where: { postId: post.id },
     })
-    const likes = +(await this.likeService.numPostLikes(post.id)).message
+    const likes = +(await this.postLikeService.numPostLikes(post.id)).message
 
     const data: CommentInput = {
       id: comment.id,
@@ -187,7 +188,7 @@ export class CommentService {
     const comments = await this.commentRepo.findAll({
       where: { postId: post.id },
     })
-    const likes = +(await this.likeService.numPostLikes(post.id)).message
+    const likes = +(await this.postLikeService.numPostLikes(post.id)).message
 
     const data: CommentInput = {
       id: comment.id,
@@ -355,7 +356,8 @@ export class CommentService {
       limit: 10,
     })
 
-    const likes = +(await this.likeService.numPostLikes(post.id)).message || 0
+    const likes =
+      +(await this.postLikeService.numPostLikes(post.id)).message || 0
 
     const banner = await (
       await this.bannerRepo.findByPk(post.bannerId)
@@ -420,7 +422,7 @@ export class CommentService {
     const comments = await this.commentRepo.findAll({
       where: { postId: post.id },
     })
-    const likes = +(await this.likeService.numPostLikes(post.id)).message
+    const likes = +(await this.postLikeService.numPostLikes(post.id)).message
 
     const userPost = (await this.userRepo.findByPk(post.userId))?.dataValues
 

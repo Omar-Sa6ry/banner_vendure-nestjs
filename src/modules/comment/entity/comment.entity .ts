@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { Reply } from 'src/modules/reply/entity/reply.entity'
+import { Like } from 'src/modules/like/entity/like.entity '
 import { Post } from 'src/modules/post/entity/post.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 import {
@@ -60,4 +61,7 @@ export class Comment extends Model<Comment> {
 
   @HasMany(() => Reply)
   replies: Reply[]
+
+  @HasMany(() => Like, { foreignKey: 'commentId', onDelete: 'SET NULL' })
+  likes: Like[]
 }

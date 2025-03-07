@@ -9,17 +9,17 @@ import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { CommentLoader } from './loader/comment.loader'
 import { RedisModule } from 'src/common/redis/redis.module'
-import { LikeModule } from '../like/like.module'
 import { Like } from '../like/entity/like.entity '
 import { NotificationModule } from 'src/common/queues/notification/notification.module'
 import { Banner } from '../banner/entity/bannner.entity'
+import { PostLikeModule } from '../like/modules/postLike.module'
 
 @Module({
   imports: [
     UserModule,
     WebSocketModule,
     RedisModule,
-    LikeModule,
+    PostLikeModule,
     NotificationModule,
     SequelizeModule.forFeature([Post, Banner, User, Like, Comment]),
   ],

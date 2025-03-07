@@ -1,60 +1,63 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
 import { Role } from 'src/common/constant/enum.constant'
+import { ReplyLikesInputResponse } from '../inputs/replyLike.input'
 import { Auth } from 'src/common/decerator/auth.decerator'
 import { CurrentUser } from 'src/common/decerator/currentUser.decerator'
 import { CurrentUserDto } from 'src/common/dtos/currentUser.dto'
-import { LikeService } from './like.service'
-import { Like } from './entity/like.entity '
-import { LikeResponse, LikesResponse } from './dto/like.response'
+import { Like } from '../entity/like.entity '
 import { RedisService } from 'src/common/redis/redis.service'
-import { LikesInputResponse } from './input/like.input'
+import { ReplyLikeService } from '../services/replyLike.service'
+import {
+  ReplyLikeResponse,
+  ReplyLikesResponse,
+} from '../dtos/replyLike.response'
 
 @Resolver(() => Like)
-export class LikeResolver {
+export class ReplyLikeResolver {
   constructor (
     private readonly redisService: RedisService,
-    private readonly likeService: LikeService,
+    private readonly likeService: ReplyLikeService,
   ) {}
 
-  @Mutation(() => LikeResponse)
+  @Mutation(() => ReplyLikeResponse)
   @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
-  async likePost (
+  async likeReply (
     @CurrentUser() user: CurrentUserDto,
-    @Args('postId', { type: () => Int }) postId: number,
-  ): Promise<LikeResponse> {
-    return this.likeService.likePost(user.id, postId)
+    @Args('replyId', { type: () => Int }) replyId: number,
+  ): Promise<ReplyLikeResponse> {
+    return this.likeService.likeReply(user.id, replyId)
   }
 
-  @Mutation(() => String)
+  @Mutation(() => ReplyLikeResponse)
   @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
-  async unlikePost (
+  async unlikeReply (
     @CurrentUser() user: CurrentUserDto,
-    @Args('postId', { type: () => Int }) postId: number,
-  ): Promise<string> {
-    return this.likeService.unLikePost(user.id, postId)
+    @Args('replyId', { type: () => Int }) replyId: number,
+  ): Promise<ReplyLikeResponse> {
+    return this.likeService.unReplyLike(user.id, replyId)
   }
 
-  @Query(() => LikesResponse)
+  @Query(() => ReplyLikesResponse)
   @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
-  async likedUser (
+  async commnetLikedUser (
     @CurrentUser() user: CurrentUserDto,
     @Args('page', { type: () => Int, nullable: true }) page: number,
     @Args('limit', { type: () => Int, nullable: true }) limit: number,
-  ): Promise<LikesResponse> {
+  ): Promise<ReplyLikesResponse> {
     const likeCacheKey = `like-user:${user.id}`
     const cachedLike = await this.redisService.get(likeCacheKey)
-    if (cachedLike instanceof LikesInputResponse) {
+    if (cachedLike instanceof ReplyLikesInputResponse) {
       return { ...cachedLike }
     }
 
-    return this.likeService.userPostLikes(user.id, page, limit)
+    return this.likeService.userReplyLikes(user.id, page, limit)
   }
 
-  @Query(() => LikeResponse)
+  @Query(() => ReplyLikeResponse)
   @Auth(Role.USER, Role.VENDOR, Role.PARTNER, Role.ADMIN, Role.MANAGER)
-  async postLikeCount (
-    @Args('postId', { type: () => Int }) postId: number,
-  ): Promise<LikeResponse> {
-    return this.likeService.numPostLikes(postId)
+  async commentLikeCount (
+    @Args('replyId', { type: () => Int }) replyId: number,
+  ): Promise<ReplyLikeResponse> {
+    return this.likeService.numReplyLikes(replyId)
   }
 }

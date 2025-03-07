@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { LikeService } from './../like/like.service'
+import { PostLikeService } from '../like/services/postLike.service'
 import { Post } from './entity/post.entity '
 import { User } from '../users/entity/user.entity'
 import { RedisService } from 'src/common/redis/redis.service'
@@ -26,7 +26,7 @@ export class PostService {
   constructor (
     private readonly i18n: I18nService,
     private readonly redisService: RedisService,
-    private readonly likeService: LikeService,
+    private readonly likeService: PostLikeService,
     private readonly postLoader: postLoader,
     private readonly websocketGateway: WebSocketMessageGateway,
     @InjectModel(Post) private postRepo: typeof Post,

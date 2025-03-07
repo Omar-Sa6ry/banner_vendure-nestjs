@@ -3,25 +3,26 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { Like } from './entity/like.entity '
-import { Post } from '../post/entity/post.entity '
-import { User } from '../users/entity/user.entity'
-import { Comment } from '../comment/entity/comment.entity '
+import { Like } from '../entity/like.entity '
+import { Post } from '../../post/entity/post.entity '
+import { User } from '../../users/entity/user.entity'
+import { Comment } from '../../comment/entity/comment.entity '
+import { PostLikeLoader } from '../loaders/postLike.loader'
 import { NotificationService } from 'src/common/queues/notification/notification.service'
 import { InjectModel } from '@nestjs/sequelize'
 import { I18nService } from 'nestjs-i18n'
 import { RedisService } from 'src/common/redis/redis.service'
 import { WebSocketMessageGateway } from 'src/common/websocket/websocket.gateway'
-import { LikeLoader } from './loader/like.loader'
 import { Limit, Page } from 'src/common/constant/messages.constant'
 import {
   LikeInput,
   LikeInputResponse,
   LikesInputResponse,
-} from './input/like.input'
+} from '../inputs/postLike.input'
+import { Op } from 'sequelize'
 
 @Injectable()
-export class LikeService {
+export class PostLikeService {
   constructor (
     @InjectModel(Post) private postRepo: typeof Post,
     @InjectModel(User) private userRepo: typeof User,
@@ -29,7 +30,7 @@ export class LikeService {
     @InjectModel(Comment) private commentRepo: typeof Comment,
     private readonly i18n: I18nService,
     private readonly redisService: RedisService,
-    private readonly likeLoader: LikeLoader,
+    private readonly likeLoader: PostLikeLoader,
     private readonly websocketGateway: WebSocketMessageGateway,
     private readonly notificationService: NotificationService,
   ) {}
@@ -47,9 +48,9 @@ export class LikeService {
       where: { userId, postId: id },
     })
     if (postLike)
-      throw new BadRequestException(await this.i18n.t('like.NOT_FOUND'))
+      throw new BadRequestException(await this.i18n.t('likePost.EXIST'))
 
-    const transaction = await this.postRepo.sequelize.transaction()
+    const transaction = await this.likeRepo.sequelize.transaction()
 
     try {
       const like = await this.likeRepo.create({
@@ -73,10 +74,14 @@ export class LikeService {
       const likes = +(await this.numPostLikes(post.id)).message
 
       const data: LikeInput = {
-        id: like.id,
-        createdAt: like.createdAt,
-        user,
-        post: { ...post, likes, user: userPost, comments: postComments },
+        ...like.dataValues,
+        user: user.dataValues,
+        post: {
+          ...post.dataValues,
+          likes,
+          user: userPost.dataValues,
+          comments: postComments.map(comment => comment.dataValues),
+        },
       }
 
       const relationCacheKey = `like:${like.id}`
@@ -106,7 +111,7 @@ export class LikeService {
     }
   }
 
-  async unLikePost (userId: number, postId: number): Promise<string> {
+  async unLikePost (userId: number, postId: number): Promise<LikeInputResponse> {
     const user = await this.userRepo.findOne({
       where: { id: userId },
     })
@@ -119,7 +124,8 @@ export class LikeService {
       where: { postId, userId },
     })
 
-    if (!like) throw new NotFoundException(await this.i18n.t('like.NOT_FOUND'))
+    if (!like)
+      throw new NotFoundException(await this.i18n.t('likePost.NOT_FOUND'))
 
     await like.destroy()
     const relationCacheKey = `like:${like.id}`
@@ -130,11 +136,11 @@ export class LikeService {
       userId,
     })
 
-    return await this.i18n.t('like.DELETED')
+    return { message: await this.i18n.t('likePost.DELETED'), data: null }
   }
 
   async numPostLikes (postId: number): Promise<LikeInputResponse> {
-    const { rows: data, count: total } = await this.likeRepo.findAndCountAll({
+    const { count: total } = await this.likeRepo.findAndCountAll({
       where: { postId },
     })
 
@@ -147,13 +153,13 @@ export class LikeService {
     limit: number = Limit,
   ): Promise<LikesInputResponse> {
     const { rows: data, count: total } = await this.likeRepo.findAndCountAll({
-      where: { userId },
+      where: { userId, postId: { [Op.ne]: null } },
       limit,
       offset: (page - 1) * limit,
       order: [['createdAt', 'DESC']],
     })
     if (data.length === 0) {
-      throw new NotFoundException(await this.i18n.t('like.NOT_FOUNDS'))
+      throw new NotFoundException(await this.i18n.t('likePost.NOT_FOUNDS'))
     }
 
     const likesIds = data.map(like => like.id)
@@ -161,7 +167,7 @@ export class LikeService {
 
     const items: LikeInput[] = data.map((p, index) => {
       const like = likes[index]
-      if (!like) throw new NotFoundException(this.i18n.t('like.NOT_FOUND'))
+      if (!like) throw new NotFoundException(this.i18n.t('likePost.NOT_FOUND'))
 
       return like
     })

@@ -9,7 +9,7 @@ import { WebSocketModule } from 'src/common/websocket/websocket.module'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { postLoader } from './loader/post.loader'
 import { Comment } from '../comment/entity/comment.entity '
-import { LikeModule } from '../like/like.module'
+import { PostLikeModule } from '../like/modules/postLike.module'
 import { Like } from '../like/entity/like.entity '
 import { Banner } from '../banner/entity/bannner.entity'
 
@@ -17,7 +17,7 @@ import { Banner } from '../banner/entity/bannner.entity'
   imports: [
     SequelizeModule.forFeature([Post, Banner, Like, Comment, User]),
     UserModule,
-    LikeModule,
+    PostLikeModule,
     RedisModule,
     WebSocketModule,
   ],

@@ -5,12 +5,12 @@ import { User } from 'src/modules/users/entity/user.entity'
 import { InjectModel } from '@nestjs/sequelize'
 import { Op } from 'sequelize'
 import { I18nService } from 'nestjs-i18n'
-import { LikeInput } from '../input/like.input'
+import { LikeInput } from '../inputs/postLike.input'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { Like } from '../entity/like.entity '
 
 @Injectable()
-export class LikeLoader {
+export class PostLikeLoader {
   private loader: DataLoader<number, LikeInput>
 
   constructor (
@@ -32,7 +32,6 @@ export class LikeLoader {
       })
       const userMap = new Map(users.map(user => [user.id, user]))
 
-      // Post and his details
       const postIds = [...new Set(likes.map(like => like.postId))]
       const posts = await this.postRepo.findAll({
         where: { id: { [Op.in]: postIds } },
@@ -71,14 +70,16 @@ export class LikeLoader {
         const like = likeMap.get(id)
         if (!like) throw new NotFoundException(this.i18n.t('like.NOT_FOUND'))
 
-        const user = userMap.get(like.userId)
-        const post = posttMap.get(like.postId)
-        const userPost = postUserMap.get(post.userId)
-        const comments = commentMap.get(like.postId)
-        const likes = postlikeMap.get(like.postId).length
+        const user = userMap.get(like.userId).dataValues
+        const post = posttMap.get(like.postId).dataValues
+        const userPost = postUserMap.get(post.userId).dataValues
+        const likes = postlikeMap.get(like.postId).length || 0
+        const comments = commentMap
+          .get(like.postId)
+          .map(comment => comment.dataValues)
 
         return {
-          ...like,
+          ...like.dataValues,
           user,
           post: { ...post, comments, user: userPost, likes },
         }

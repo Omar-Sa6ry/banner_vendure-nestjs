@@ -1,20 +1,19 @@
 import { Field, ObjectType } from '@nestjs/graphql'
 import { Expose } from 'class-transformer'
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsInt, IsOptional } from 'class-validator'
 import { BaseResponse } from 'src/common/dtos/BaseResponse'
 import { PaginationInfo } from 'src/common/dtos/pagintion'
-import { PostOutput } from 'src/modules/post/dto/PostResponse.dto'
-import { PostInput } from 'src/modules/post/input/Post.input'
+import { ReplyOutPut } from 'src/modules/reply/dto/ReplyResponse.dto'
 import { User } from 'src/modules/users/entity/user.entity'
 
 @ObjectType()
-export class LikeOutput {
+export class ReplyLikeOutput {
   @Field()
   @IsInt()
   id: number
 
-  @Field(() => PostOutput)
-  post: PostInput
+  @Field(() => ReplyOutPut)
+  reply: ReplyOutPut
 
   @Field(() => User)
   user: User
@@ -25,10 +24,10 @@ export class LikeOutput {
 }
 
 @ObjectType()
-export class LikesResponse extends BaseResponse {
-  @Field(() => [LikeOutput], { nullable: true })
+export class ReplyLikesResponse extends BaseResponse {
+  @Field(() => [ReplyLikeOutput], { nullable: true })
   @Expose()
-  items: LikeOutput[]
+  items: ReplyLikeOutput[]
 
   @IsOptional()
   @Field(() => PaginationInfo, { nullable: true })
@@ -37,8 +36,8 @@ export class LikesResponse extends BaseResponse {
 }
 
 @ObjectType()
-export class LikeResponse extends BaseResponse {
-  @Field(() => LikeOutput, { nullable: true })
+export class ReplyLikeResponse extends BaseResponse {
+  @Field(() => ReplyLikeOutput, { nullable: true })
   @Expose()
-  data: LikeOutput
+  data: ReplyLikeOutput
 }
