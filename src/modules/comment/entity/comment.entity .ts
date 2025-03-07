@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
+import { Reply } from 'src/modules/reply/entity/reply.entity'
 import { Post } from 'src/modules/post/entity/post.entity '
 import { User } from 'src/modules/users/entity/user.entity'
 import {
@@ -10,6 +11,7 @@ import {
   CreatedAt,
   DataType,
   UpdatedAt,
+  HasMany,
 } from 'sequelize-typescript'
 
 @ObjectType()
@@ -55,4 +57,7 @@ export class Comment extends Model<Comment> {
 
   @BelongsTo(() => Post, { onDelete: 'CASCADE' })
   post: Post
+
+  @HasMany(() => Reply)
+  replies: Reply[]
 }

@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Comment {
+  id: Int!
+  content: String!
+  postId: Int!
+  userId: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type User {
   id: Int!
   userName: String!
@@ -13,11 +27,6 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Campaign {
   id: Int!
@@ -53,15 +62,6 @@ type Banner {
   url_en: String!
   isActive: Boolean!
   score: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type Comment {
-  id: Int!
-  content: String!
-  postId: Int!
-  userId: Int
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -391,6 +391,31 @@ type BuyerResponse {
   data: BuyerOutput
 }
 
+type ReplyOutPut {
+  id: Float!
+  content: String!
+  comment: Comment!
+  user: User!
+  createdAt: DateTime!
+}
+
+type ReplysResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [ReplyOutPut!]
+  pagination: PaginationInfo
+}
+
+type ReplyResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: ReplyOutPut
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
@@ -439,6 +464,12 @@ type Query {
   getCommentsByUser: CommentsResponse!
   getUserByComment(commentId: Int!): UserResponse!
   getPostByComment(commentId: Int!): PostResponse!
+  getReply(commentId: Float!, content: String!): ReplyResponse!
+  getRepliesByComment(commentId: Float!): ReplysResponse!
+  getRepliesCount(commentId: Float!): ReplyResponse!
+  getRepliesByUser(page: Int, limit: Int): ReplysResponse!
+  getLastReplies(commentId: Float!, page: Int, limit: Int): ReplysResponse!
+  getUserByReply(id: Float!): UserResponse!
 }
 
 input CampaignDto {
@@ -485,6 +516,9 @@ type Mutation {
   writeComment(postId: Int!, content: String!): CommentResponse!
   updateComment(commentId: Int!, content: String!): CommentResponse!
   deleteComment(commentId: Int!): CommentResponse!
+  writeReply(commentId: Float!, content: String!): ReplyResponse!
+  updateReply(id: Float!, content: String!): ReplyResponse!
+  deleteReply(id: Float!): ReplyResponse!
 }
 
 input CreateUserDto {

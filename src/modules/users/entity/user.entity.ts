@@ -4,6 +4,9 @@ import { Exclude } from 'class-transformer'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Like } from 'src/modules/like/entity/like.entity '
+import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
+import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
+import { Reply } from 'src/modules/reply/entity/reply.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Post } from 'src/modules/post/entity/post.entity '
 import {
@@ -16,9 +19,6 @@ import {
   CreatedAt,
   UpdatedAt,
 } from 'sequelize-typescript'
-import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
-import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
-
 @ObjectType()
 @Table({ tableName: 'user', timestamps: true })
 export class User extends Model<User> {
@@ -105,6 +105,9 @@ export class User extends Model<User> {
 
   @HasMany(() => Like)
   likes: Like[]
+
+  @HasMany(() => Reply)
+  replies: Reply[]
 
   @HasMany(() => Buyer)
   buyers: Buyer[]

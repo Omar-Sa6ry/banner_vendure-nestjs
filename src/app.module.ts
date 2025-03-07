@@ -18,6 +18,7 @@ import { InteractionModule } from './modules/interaction/interaction.module'
 import { FollowModule } from './modules/follow/follow.module'
 import { VendorModule } from './modules/vendour/vendor.module'
 import { BuyerModule } from './modules/buyer/buyer.module'
+import { ReplyModule } from './modules/reply/reply.module'
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { BuyerModule } from './modules/buyer/buyer.module'
     InteractionModule,
     PostModule,
     CommentModule,
+    ReplyModule,
     LikeModule,
   ],
 
