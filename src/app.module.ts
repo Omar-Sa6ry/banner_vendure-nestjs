@@ -21,6 +21,9 @@ import { ReplyModule } from './modules/reply/reply.module'
 import { PostLikeModule } from './modules/like/modules/postLike.module'
 import { CommentLikeModule } from './modules/like/modules/commentLike.module'
 import { ReplyLikeModule } from './modules/like/modules/replyLike.module'
+import { PostHashtagModule } from './modules/hastage/modules/postHashtage.module'
+import { CommentHashtagModule } from './modules/hastage/modules/commentHashtage.module'
+import { ReplyHashtagModule } from './modules/hastage/modules/replyHashtage.module'
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { ReplyLikeModule } from './modules/like/modules/replyLike.module'
     PostLikeModule,
     CommentLikeModule,
     ReplyLikeModule,
+    PostHashtagModule,
+    CommentHashtagModule,
+    ReplyHashtagModule,
   ],
 
   providers: [AppService, AppResolver],

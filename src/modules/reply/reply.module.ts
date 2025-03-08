@@ -21,5 +21,6 @@ import { ReplyLoader } from './loader/reply.loader'
     WebSocketModule,
   ],
   providers: [ReplyResolver, ReplyService, ReplyLoader],
+  exports: [ReplyService, ReplyLoader, NotificationModule],
 })
 export class ReplyModule {}

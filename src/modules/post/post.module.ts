@@ -22,5 +22,6 @@ import { Banner } from '../banner/entity/bannner.entity'
     WebSocketModule,
   ],
   providers: [PostResolver, PostService, postLoader],
+  exports: [PostService, postLoader, PostLikeModule],
 })
 export class PostModule {}

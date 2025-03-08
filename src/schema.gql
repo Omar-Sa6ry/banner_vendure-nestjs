@@ -464,6 +464,81 @@ type ReplyLikeResponse {
   data: ReplyLikeOutput
 }
 
+type PostHastageOutPut {
+  id: Float!
+  content: String!
+  post: PostOutput!
+  user: User!
+  createdAt: DateTime!
+}
+
+type PostHastagesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [PostHastageOutPut!]
+  pagination: PaginationInfo
+}
+
+type PostHastageResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: PostHastageOutPut
+}
+
+type CommentHastageOutput {
+  id: Float!
+  content: String!
+  commnet: CommentOutput!
+  user: User!
+  createdAt: DateTime!
+}
+
+type CommentHastagesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [CommentHastageOutput!]
+  pagination: PaginationInfo
+}
+
+type CommentHastageResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: CommentHastageOutput
+}
+
+type ReplyHastageOutput {
+  id: Float!
+  content: String!
+  reply: ReplyOutPut!
+  user: User!
+  createdAt: DateTime!
+}
+
+type ReplyHastagesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [ReplyHastageOutput!]
+  pagination: PaginationInfo
+}
+
+type ReplyHastageResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: ReplyHastageOutput
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
@@ -520,6 +595,15 @@ type Query {
   getUserByReply(id: Float!): UserResponse!
   commnetLikedUser(page: Int, limit: Int): ReplyLikesResponse!
   commentLikeCount(replyId: Int!): ReplyLikeResponse!
+  findPostByHashtag(content: String!): PostHastageResponse!
+  findAllPostHashtags(postId: Float!, page: Int, limit: Int): PostHastagesResponse!
+  findAllUserHashtagOnPost(page: Int, limit: Int): PostHastagesResponse!
+  findCommentByHashtag(content: String!): CommentHastageResponse!
+  findAllCommentHashtags(commentId: Float!, page: Int, limit: Int): CommentHastagesResponse!
+  findAllUserHashtagsOnComments(page: Int, limit: Int): CommentHastagesResponse!
+  findReplyHashtag(id: Int!): ReplyHastageResponse
+  findAllReplyHashtags(replyId: Int!, page: Int, limit: Int): ReplyHastagesResponse!
+  findAllUserHashtagOnReply(page: Int, limit: Int): ReplyHastagesResponse!
 }
 
 input CampaignDto {
@@ -573,6 +657,13 @@ type Mutation {
   unlikeComment(commentId: Int!): CommentLikeResponse!
   likeReply(replyId: Int!): ReplyLikeResponse!
   unlikeReply(replyId: Int!): ReplyLikeResponse!
+  createHashtagPost(postId: Float!, content: String!): PostHastageResponse!
+  updateHashtagPost(id: Float!, postId: Float!, content: String!): PostHastageResponse!
+  createHashtagComment(commentId: Float!, content: String!): CommentHastageResponse!
+  updateHashtagComment(id: Float!, commentId: Float!, content: String!): CommentHastageResponse!
+  createHashtagReply(replyId: Int!, content: String!): ReplyHastageResponse!
+  updateHashtagReply(id: Int!, replyId: Int!, content: String!): ReplyHastageResponse!
+  deleteHashtag(id: Int!): ReplyHastageResponse!
 }
 
 input CreateUserDto {

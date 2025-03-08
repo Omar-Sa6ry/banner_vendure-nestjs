@@ -1,0 +1,9 @@
+{
+  "CREATED": "hashtag on this Reply of Commnet created successfully",
+  "UPDATED": "hashtag on this Reply of Commnet updated successfully",
+  "DELETED": "hashtag on this Reply of Commnet deleted successfully",
+  "EXIST": "hashtag is already existed",
+  "NOT_FOUND": "hashtag on this Reply of Commnet not found",
+  "NOT_FOUNDS": "No hashtag on this Replies of Commnet found",
+  "HashtagNOTEQUALUSERID": "hashtag on this Reply of Commnet not found"
+}

@@ -24,5 +24,6 @@ import { PostLikeModule } from '../like/modules/postLike.module'
     SequelizeModule.forFeature([Post, Banner, User, Like, Comment]),
   ],
   providers: [CommentResolver, CommentService, CommentLoader],
+  exports: [CommentService, CommentLoader, PostLikeModule],
 })
 export class CommentModule {}

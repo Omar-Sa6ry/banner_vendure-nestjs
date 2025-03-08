@@ -6,6 +6,7 @@ import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
 import { Follow } from 'src/modules/follow/entity/follow.entity'
+import { Hashtag } from 'src/modules/hastage/entity/hastage.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Like } from 'src/modules/like/entity/like.entity '
 import { Partner } from 'src/modules/partner/entity/partner.entity'
@@ -35,9 +36,10 @@ import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
           Banner,
           Interaction,
           Post,
-          Like,
           Comment,
           Reply,
+          Like,
+          Hashtag,
         ],
         autoLoadModels: true,
         synchronize: true,

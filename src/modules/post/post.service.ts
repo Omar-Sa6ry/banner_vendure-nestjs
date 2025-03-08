@@ -121,11 +121,11 @@ export class PostService {
       throw new BadRequestException(await this.i18n.t('banner.NOT_FOUND'))
 
     const data: PostInput = {
-      ...post,
-      user,
-      comments,
+      ...post.dataValues,
+      user: user.dataValues,
+      comments: comments.map(c => c.dataValues),
       likes,
-      banner,
+      banner: banner.dataValues,
     }
 
     const relationCacheKey = `posts:${id}`
