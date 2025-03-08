@@ -539,6 +539,32 @@ type ReplyHastageResponse {
   data: ReplyHastageOutput
 }
 
+type MessageOutput {
+  id: Float!
+  content: String!
+  isRead: Boolean!
+  sender: User!
+  receiver: User!
+  createdAt: DateTime!
+}
+
+type MessagesResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [MessageOutput!]
+  pagination: PaginationInfo
+}
+
+type MessageResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: MessageOutput
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
@@ -553,6 +579,9 @@ type Query {
   getAllBuyers(page: Int, limit: Int): BuyersResponse!
   getBuyersByBannerId(bannerId: Int!, page: Int, limit: Int): BuyersResponse!
   getBuyersByUserId(userId: Int!, page: Int, limit: Int): BuyersResponse!
+  chat(receiverId: Int!): MessagesResponse!
+  userMessages: MessagesResponse!
+  unreadMessages(receiverId: Int!, page: Int, limit: Int): MessagesResponse!
   getRelationStatus(followingId: Float!): FollowResponse!
   getFollowers(followerId: Float!, page: Int, limit: Int): FollowsResponse!
   getFollowings(followingId: Float!, page: Int, limit: Int): FollowsResponse!
@@ -630,6 +659,9 @@ type Mutation {
   deleteVendor(id: Int!): VendorResponse!
   createBuyer(bannerId: Int!): CreateBuyerResponse!
   deleteBuyer(id: Int!): BuyerResponse!
+  sendMessage(createMessageDto: CreateMessageDto!): MessageResponse!
+  markMessageAsRead(receiverId: Int!): MessageResponse!
+  deleteMessage(id: Int!): MessageResponse!
   followUser(followingId: Float!): FollowResponse!
   unfollowingUser(followerId: Float!): FollowResponse!
   acceptFollowRequest(followingId: Float!, status: Boolean!): FollowResponse!
@@ -703,6 +735,11 @@ input UpdateUserDto {
   avatar: CreateImagDto
   email: String
   phone: String
+}
+
+input CreateMessageDto {
+  content: String!
+  receiverId: Float!
 }
 
 input CreateCampaignCDto {

@@ -9,6 +9,7 @@ import { Follow } from 'src/modules/follow/entity/follow.entity'
 import { Hashtag } from 'src/modules/hastage/entity/hastage.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Like } from 'src/modules/like/entity/like.entity '
+import { Message } from 'src/modules/message/entity/message.entity'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Post } from 'src/modules/post/entity/post.entity '
 import { Reply } from 'src/modules/reply/entity/reply.entity'
@@ -31,6 +32,7 @@ import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
           Vendor,
           Buyer,
           Follow,
+          Message,
           Campaign,
           Partner,
           Banner,

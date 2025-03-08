@@ -1,0 +1,7 @@
+{
+  "CREATED": "message is send successfully",
+  "READED": "message is readed successfully",
+  "DELETED": "message is deleted successfully",
+  "NOT_FOUND": "messsage not found",
+  "NOT_FOUNDS": "There is no messages found"
+}

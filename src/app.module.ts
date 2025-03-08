@@ -24,6 +24,7 @@ import { ReplyLikeModule } from './modules/like/modules/replyLike.module'
 import { PostHashtagModule } from './modules/hastage/modules/postHashtage.module'
 import { CommentHashtagModule } from './modules/hastage/modules/commentHashtage.module'
 import { ReplyHashtagModule } from './modules/hastage/modules/replyHashtage.module'
+import { MessageModule } from './modules/message/message.module'
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ReplyHashtagModule } from './modules/hastage/modules/replyHashtage.modu
     UserModule,
     VendorModule,
     BuyerModule,
+    MessageModule,
     FollowModule,
     CampaignModule,
     PartnerModule,

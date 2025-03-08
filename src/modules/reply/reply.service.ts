@@ -248,9 +248,7 @@ export class ReplyService {
     if (data.length === 0)
       throw new NotFoundException(await this.i18n.t('reply.NOT_FOUNDS'))
 
-    const replies = await this.replyLoader.loadMany(
-      data.map(reply => reply.id),
-    )
+    const replies = await this.replyLoader.loadMany(data.map(reply => reply.id))
 
     const items: ReplyInput[] = await Promise.all(
       data.map(async (r, index) => {

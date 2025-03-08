@@ -7,6 +7,7 @@ import { Like } from 'src/modules/like/entity/like.entity '
 import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
 import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
 import { Reply } from 'src/modules/reply/entity/reply.entity'
+import { Message } from 'src/modules/message/entity/message.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Post } from 'src/modules/post/entity/post.entity '
 import {
@@ -19,6 +20,7 @@ import {
   CreatedAt,
   UpdatedAt,
 } from 'sequelize-typescript'
+
 @ObjectType()
 @Table({ tableName: 'user', timestamps: true })
 export class User extends Model<User> {
@@ -93,6 +95,12 @@ export class User extends Model<User> {
 
   @HasMany(() => Partner)
   partner: Partner[]
+
+  @HasMany(() => Message)
+  recievers: Message[]
+
+  @HasMany(() => Message)
+  senders: Message[]
 
   @HasMany(() => Interaction)
   interactions: Interaction[]
