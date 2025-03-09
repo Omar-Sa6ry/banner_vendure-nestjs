@@ -25,6 +25,7 @@ import { PostHashtagModule } from './modules/hastage/modules/postHashtage.module
 import { CommentHashtagModule } from './modules/hastage/modules/commentHashtage.module'
 import { ReplyHashtagModule } from './modules/hastage/modules/replyHashtage.module'
 import { MessageModule } from './modules/message/message.module'
+import { BlockModule } from './modules/block/block.module'
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { MessageModule } from './modules/message/message.module'
     BuyerModule,
     MessageModule,
     FollowModule,
+    BlockModule,
     CampaignModule,
     PartnerModule,
     BannerModule,

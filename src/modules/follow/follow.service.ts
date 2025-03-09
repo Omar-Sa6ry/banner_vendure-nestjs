@@ -43,21 +43,22 @@ export class FollowService {
     if (!following)
       throw new NotFoundException(await this.i18n.t('follow.NOT_FOUNDING'))
 
-    const follow = await this.followRepo.findOne({
+    let follow = await this.followRepo.findOne({
       where: { followerId, followingId: following.id },
     })
 
     if (!follow) {
       let status: Status = Status.PENDING
-      if (!follow && following.status !== UserStatus.PRIVACY) {
+      if (following.status !== UserStatus.PRIVACY) {
         status = Status.FOLLOW
       }
 
-      const IsFriend = await this.followRepo.findOne({
+      const isFriend = await this.followRepo.findOne({
         where: { followerId: followingId, followingId: followerId },
       })
-      if (IsFriend) {
-        IsFriend.status = Status.FRIEND
+      if (isFriend) {
+        isFriend.status = Status.FRIEND
+        await isFriend.save()
       }
 
       const relation = await this.followRepo.create({
@@ -66,38 +67,43 @@ export class FollowService {
         status,
       })
 
-      await follow.save()
+      await relation.save()
 
       const result: FollowInputResponse = {
         statusCode: 201,
         message: await this.i18n.t('follow.CREATED'),
-        data: { ...relation, follower, following },
+        data: {
+          ...relation.dataValues,
+          follower: follower.dataValues,
+          following: following.dataValues,
+        },
       }
 
-      const relationCacheKey = `follow:${follow.id}`
+      const relationCacheKey = `follow:${relation.id}`
       await this.redisService.set(relationCacheKey, result)
 
       this.websocketGateway.broadcast('followCreated', {
-        followId: follow.id,
-        follow,
+        followId: relation.id,
+        follow: relation,
       })
 
       this.notificationService.sendNotification(
         following.fcmToken,
         await this.i18n.t('comment.CREATED'),
-        `${follower.userName} follow you`,
+        `${follower.userName} followed you`,
       )
 
       return result
     }
 
     await follow.destroy()
-    const IsFriend = await this.followRepo.findOne({
+
+    const isFriend = await this.followRepo.findOne({
       where: { followerId: following.id, followingId: followerId },
     })
-    if (IsFriend) {
-      IsFriend.status = Status.FOLLOW
-      await IsFriend.save()
+    if (isFriend) {
+      isFriend.status = Status.FOLLOW
+      await isFriend.save()
     }
 
     const result: FollowInputResponse = {
@@ -178,7 +184,13 @@ export class FollowService {
     if (!follow)
       throw new NotFoundException(await this.i18n.t('follow.NO_RELATION'))
 
-    return { data: { ...follow, follower, following } }
+    return {
+      data: {
+        ...follow.dataValues,
+        follower: follower.dataValues,
+        following: following.dataValues,
+      },
+    }
   }
 
   async getFollowers (
@@ -350,7 +362,11 @@ export class FollowService {
 
       return {
         message: await this.i18n.t('follow.ACCEPT'),
-        data: { ...follow, follower, following },
+        data: {
+          ...follow.dataValues,
+          follower: follower.dataValues,
+          following: following.dataValues,
+        },
       }
     }
 

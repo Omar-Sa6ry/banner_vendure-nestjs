@@ -36,15 +36,15 @@ export class FollowLoader {
           if (!follow)
             throw new NotFoundException(this.i18n.t('follow.NOT_FOUND'))
 
-          const follower = userMap.get(follow.followerId)
+          const follower = userMap.get(follow.followerId).dataValues
           if (!follower)
             throw new NotFoundException(this.i18n.t('follow.NOT_FOUNDER'))
 
-          const following = userMap.get(follow.followingId)
+          const following = userMap.get(follow.followingId).dataValues
           if (!following)
             throw new NotFoundException(this.i18n.t('follow.NOT_FOUNDER'))
 
-          return { ...follow, follower, following }
+          return { ...follow.dataValues, follower, following }
         })
       },
     )

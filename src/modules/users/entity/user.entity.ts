@@ -2,6 +2,8 @@ import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { Role, UserStatus } from 'src/common/constant/enum.constant'
 import { Exclude } from 'class-transformer'
 import { Partner } from 'src/modules/partner/entity/partner.entity'
+import { Follow } from 'src/modules/follow/entity/follow.entity'
+import { Block } from 'src/modules/block/entity/block.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
 import { Like } from 'src/modules/like/entity/like.entity '
 import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
@@ -119,4 +121,16 @@ export class User extends Model<User> {
 
   @HasMany(() => Buyer)
   buyers: Buyer[]
+
+  @HasMany(() => Follow)
+  follower: Follow[]
+
+  @HasMany(() => Block)
+  blocker: Block[]
+
+  @HasMany(() => Follow)
+  following: Follow[]
+
+  @HasMany(() => Block)
+  blocking: Block[]
 }

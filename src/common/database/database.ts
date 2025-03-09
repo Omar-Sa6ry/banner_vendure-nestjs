@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize'
 import { Banner } from 'src/modules/banner/entity/bannner.entity'
+import { Block } from 'src/modules/block/entity/block.entity'
 import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
 import { Campaign } from 'src/modules/campaign/entity/campaign.entity'
 import { Comment } from 'src/modules/comment/entity/comment.entity '
@@ -32,6 +33,7 @@ import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
           Vendor,
           Buyer,
           Follow,
+          Block,
           Message,
           Campaign,
           Partner,

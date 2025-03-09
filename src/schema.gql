@@ -565,6 +565,29 @@ type MessageResponse {
   data: MessageOutput
 }
 
+type BlockOutput {
+  id: Float!
+  blocker: User!
+  blocking: User!
+}
+
+type BlocksResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [BlockOutput!]
+  pagination: PaginationInfo
+}
+
+type BlockResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: BlockOutput
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
@@ -586,6 +609,7 @@ type Query {
   getFollowers(followerId: Float!, page: Int, limit: Int): FollowsResponse!
   getFollowings(followingId: Float!, page: Int, limit: Int): FollowsResponse!
   getFriends(page: Int, limit: Int): FollowsResponse!
+  getBlockedUsers(page: Int, limit: Int): BlocksResponse!
   getCampaignById(id: Int!): CampaignResponse!
   getCampaigns(campaignDto: CampaignDto, page: Int, limit: Int): CampaignsResponse!
   getListCampaigns(page: Int, limit: Int): CampaignsResponse!
@@ -665,6 +689,8 @@ type Mutation {
   followUser(followingId: Float!): FollowResponse!
   unfollowingUser(followerId: Float!): FollowResponse!
   acceptFollowRequest(followingId: Float!, status: Boolean!): FollowResponse!
+  blockUser(blockingId: Int!): BlockResponse!
+  unblockUser(blockingId: Int!): BlockResponse!
   createCampaign(createCampaignDto: CreateCampaignCDto!): CampaignResponse!
   UpdateCampaign(id: Int!, updateCampaignDto: CampaignDto!): CampaignResponse!
   deleteCampaign(id: Int!): CampaignResponse!

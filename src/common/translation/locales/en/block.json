@@ -1,0 +1,9 @@
+{
+  "CREATED": "Block created successfully",
+  "UPDATED": "Block updated successfully",
+  "DELETED": "Block deleted successfully",
+  "ALREADY_BLOCK": "You already block him",
+  "ALREADY_NOT_BLOCK": "You already not block him",
+  "NOT_FOUND": "Block not found",
+  "NOT_FOUNDS": "Blocks not found"
+}
