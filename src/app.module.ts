@@ -26,6 +26,9 @@ import { CommentHashtagModule } from './modules/hastage/modules/commentHashtage.
 import { ReplyHashtagModule } from './modules/hastage/modules/replyHashtage.module'
 import { MessageModule } from './modules/message/message.module'
 import { BlockModule } from './modules/block/block.module'
+import { PostMentionModule } from './modules/mention/modules/postMention.module'
+import { CommentMentionModule } from './modules/mention/modules/commentMention.module'
+import { ReplyMentionModule } from './modules/mention/modules/replyMention.module'
 
 @Module({
   imports: [
@@ -49,6 +52,9 @@ import { BlockModule } from './modules/block/block.module'
     PostModule,
     CommentModule,
     ReplyModule,
+    PostMentionModule,
+    CommentMentionModule,
+    ReplyMentionModule,
     PostLikeModule,
     CommentLikeModule,
     ReplyLikeModule,

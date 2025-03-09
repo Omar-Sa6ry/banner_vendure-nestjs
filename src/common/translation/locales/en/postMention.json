@@ -1,0 +1,9 @@
+{
+  "CREATED": "mention on this post created successfully",
+  "UPDATED": "mention on this post updated successfully",
+  "DELETED": "mention on this post deleted successfully",
+  "EXIST": "mention on this post is existed",
+  "NOT_FOUND": "mention on this post not found",
+  "NOT_FOUND_TO": "user that mention not found",
+  "NOT_FOUND_FROM": "user that is mention not found"
+}

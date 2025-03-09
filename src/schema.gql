@@ -588,6 +588,81 @@ type BlockResponse {
   data: BlockOutput
 }
 
+type PostMentionOutput {
+  id: Float!
+  mentionFrom: User!
+  mentionTo: User!
+  post: PostOutput!
+  createdAt: DateTime!
+}
+
+type PostMentionsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [PostMentionOutput!]
+  pagination: PaginationInfo
+}
+
+type PostMentionResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: PostMentionOutput
+}
+
+type CommentMentionOutput {
+  id: Float!
+  mentionFrom: User!
+  mentionTo: User!
+  comment: CommentOutput!
+  createdAt: DateTime!
+}
+
+type CommentMentionsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [CommentMentionOutput!]
+  pagination: PaginationInfo
+}
+
+type CommentMentionResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: CommentMentionOutput
+}
+
+type ReplyMentionInput {
+  id: Float!
+  mentionFrom: User!
+  mentionTo: User!
+  reply: ReplyOutPut!
+  createdAt: DateTime!
+}
+
+type ReplyMentionsResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  items: [ReplyMentionInput!]
+  pagination: PaginationInfo
+}
+
+type ReplyMentionResponse {
+  message: String
+  success: Boolean
+  timeStamp: String
+  statusCode: Float
+  data: ReplyMentionInput
+}
+
 type Query {
   sayHello: String!
   getUserById(id: Float!): UserResponse!
@@ -646,6 +721,18 @@ type Query {
   getRepliesByUser(page: Int, limit: Int): ReplysResponse!
   getLastReplies(commentId: Float!, page: Int, limit: Int): ReplysResponse!
   getUserByReply(id: Float!): UserResponse!
+  getMentionsForPost(postId: Int!, page: Int, limit: Int): PostMentionsResponse!
+  getMentionsReceivedPost(page: Int, limit: Int): PostMentionsResponse!
+  getMentionsSentPost(mentionToId: Int!, page: Int, limit: Int): PostMentionsResponse!
+  mentionsForPost(postId: Int!, mentionToId: Int!): PostMentionResponse!
+  findMentionForComment(mentionToId: Int!, commentId: Int!): CommentMentionResponse!
+  getMentionsReceivedComment(page: Int, limit: Int): CommentMentionsResponse!
+  getMentionsSentComment(mentionToId: Int!, page: Int, limit: Int): CommentMentionsResponse!
+  getMentionsForComment(commentId: Int!, page: Int, limit: Int): CommentMentionsResponse!
+  findMentionForReply(mentionToId: Int!, replyId: Int!): ReplyMentionResponse!
+  getMentionsReceivedReply(page: Int, limit: Int): ReplyMentionsResponse!
+  getMentionsSentReply(mentionToId: Int!, page: Int, limit: Int): ReplyMentionsResponse!
+  getMentionsForReply(replyId: Int!, page: Int, limit: Int): ReplyMentionsResponse!
   commnetLikedUser(page: Int, limit: Int): ReplyLikesResponse!
   commentLikeCount(replyId: Int!): ReplyLikeResponse!
   findPostByHashtag(content: String!): PostHastageResponse!
@@ -711,6 +798,12 @@ type Mutation {
   writeReply(commentId: Float!, content: String!): ReplyResponse!
   updateReply(id: Float!, content: String!): ReplyResponse!
   deleteReply(id: Float!): ReplyResponse!
+  createPostMention(mentionToId: Int!, postId: Int!): PostMentionResponse!
+  deletePostMention(mentionToId: Int!, postId: Int!): PostMentionResponse!
+  createCommentMention(mentionToId: Int!, commentId: Int!): CommentMentionResponse!
+  deleteCommentMention(mentionToId: Int!, commentId: Int!): CommentMentionResponse!
+  createReplyMention(mentionToId: Int!, replyId: Int!): ReplyMentionResponse!
+  deleteReplyMention(mentionToId: Int!, replyId: Int!): ReplyMentionResponse!
   likeComment(commentId: Int!): CommentLikeResponse!
   unlikeComment(commentId: Int!): CommentLikeResponse!
   likeReply(replyId: Int!): ReplyLikeResponse!

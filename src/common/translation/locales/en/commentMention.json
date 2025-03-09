@@ -1,0 +1,9 @@
+{
+  "CREATED": "mention on this comment created successfully",
+  "UPDATED": "mention on this comment updated successfully",
+  "DELETED": "mention on this comment deleted successfully",
+  "EXIST": "mention on this comment is existed",
+  "NOT_FOUND": "mention on this comment not found",
+  "NOT_FOUND_TO": "user that mention not found",
+  "NOT_FOUND_FROM": "user that is mention not found"
+}

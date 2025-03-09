@@ -5,6 +5,7 @@ import { Partner } from 'src/modules/partner/entity/partner.entity'
 import { Follow } from 'src/modules/follow/entity/follow.entity'
 import { Block } from 'src/modules/block/entity/block.entity'
 import { Interaction } from 'src/modules/interaction/entity/interaction.entity'
+import { Mention } from 'src/modules/mention/entity/mention.entity '
 import { Like } from 'src/modules/like/entity/like.entity '
 import { Vendor } from 'src/modules/vendour/entity/vendour.entity'
 import { Buyer } from 'src/modules/buyer/entity/buyer.entity'
@@ -133,4 +134,10 @@ export class User extends Model<User> {
 
   @HasMany(() => Block)
   blocking: Block[]
+
+  @HasMany(() => Mention)
+  mentionsFrom: Mention[]
+
+  @HasMany(() => Mention)
+  mentionsTo: Mention[]
 }
