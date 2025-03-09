@@ -30,7 +30,7 @@ export class UserService {
     const userCacheKey = `user:${user.id}`
     await this.redisService.set(userCacheKey, user)
 
-    return { data: user }
+    return { data: user.dataValues }
   }
 
   async findByUserName (userName: string): Promise<UserInputResponse> {
@@ -40,7 +40,7 @@ export class UserService {
     }
     const userCacheKey = `user:${user.userName}`
     await this.redisService.set(userCacheKey, user)
-    return { data: user }
+    return { data: user.dataValues }
   }
 
   async findByEmail (email: string): Promise<UserInputResponse> {
@@ -50,7 +50,7 @@ export class UserService {
     }
     const userCacheKey = `user:${user.email}`
     await this.redisService.set(userCacheKey, user)
-    return { data: user }
+    return { data: user.dataValues }
   }
 
   async update (
@@ -103,7 +103,7 @@ export class UserService {
       await this.redisService.set(userCacheKey, user)
 
       await transaction.commit()
-      return { data: user }
+      return { data: user.dataValues }
     } catch (error) {
       await transaction.rollback()
       throw error
@@ -117,7 +117,7 @@ export class UserService {
 
     await this.uploadService.deleteImage(user.avatar)
     await user.destroy()
-    return await this.i18n.t('user.DELETED')
+    return { message: await this.i18n.t('user.DELETED'), data: null }
   }
 
   async editUserRole (email: string): Promise<UserInputResponse> {
@@ -127,6 +127,6 @@ export class UserService {
 
     user.role = Role.ADMIN
     await user.save()
-    return { data: user, message: await this.i18n.t('user.UPDATED') }
+    return { data: user.dataValues, message: await this.i18n.t('user.UPDATED') }
   }
 }

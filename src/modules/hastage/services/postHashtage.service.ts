@@ -216,8 +216,8 @@ export class PostHashtagService {
       {
         where: { userId, postId: { [Op.not]: null } },
         order: [['createdAt', 'DESC']],
-        limit,
         offset: (page - 1) * limit,
+        limit,
       },
     )
 

@@ -216,8 +216,8 @@ export class ReplyHashtagService {
       {
         where: { userId, replyId: { [Op.not]: null } },
         order: [['createdAt', 'DESC']],
-        limit,
         offset: (page - 1) * limit,
+        limit,
       },
     )
 

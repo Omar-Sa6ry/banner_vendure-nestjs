@@ -107,6 +107,9 @@ export class PartnerService {
     const { rows: data, count: total } = await this.partnerRepo.findAndCountAll(
       {
         where: { campaignId },
+        order: [['createdAt', 'DESC']],
+        offset: (page - 1) * limit,
+        limit,
       },
     )
 
@@ -144,6 +147,9 @@ export class PartnerService {
     const { rows: data, count: total } = await this.partnerRepo.findAndCountAll(
       {
         where: { userId },
+        order: [['createdAt', 'DESC']],
+        offset: (page - 1) * limit,
+        limit,
       },
     )
 
