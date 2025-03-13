@@ -18,7 +18,6 @@ export class UserResolver {
   ) {}
 
   @Query(returns => UserResponse)
-  @Auth(Role.ADMIN, Role.MANAGER)
   async getUserById (
     @Args('id', ParseIntPipe) id: number,
   ): Promise<UserResponse> {
@@ -32,7 +31,6 @@ export class UserResolver {
   }
 
   @Query(returns => UserResponse)
-  @Auth(Role.ADMIN, Role.MANAGER)
   async getUserByEmail (@Args('email') email: string): Promise<UserResponse> {
     const userCacheKey = `user:${email}`
     const cachedUser = await this.redisService.get(userCacheKey)

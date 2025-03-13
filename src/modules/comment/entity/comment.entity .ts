@@ -37,12 +37,12 @@ export class Comment extends Model<Comment> {
 
   @Field(() => Int)
   @ForeignKey(() => Post)
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @Column({ type: DataType.INTEGER, allowNull: false })
   postId: number
 
   @Field(() => Int, { nullable: true })
   @ForeignKey(() => User)
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @Column({ type: DataType.INTEGER, allowNull: false })
   userId: number
 
   @Field(() => Date)

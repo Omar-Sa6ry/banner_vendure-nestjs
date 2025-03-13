@@ -26,7 +26,7 @@ import {
 @Injectable()
 export class CommentService {
   constructor (
-    @InjectModel(Comment) private commentRepo: typeof Comment,
+    @InjectModel(Comment) private readonly commentRepo: typeof Comment,
     @InjectModel(Post) private postRepo: typeof Post,
     @InjectModel(Banner) private bannerRepo: typeof Banner,
     @InjectModel(User) private userRepo: typeof User,
@@ -65,6 +65,7 @@ export class CommentService {
         { transaction },
       )
 
+      console.log(post)
       const comments = await this.commentRepo.findAll({
         where: { postId: post.id },
       })
@@ -85,6 +86,7 @@ export class CommentService {
           likes,
         },
       }
+console.log(data)
 
       this.websocketGateway.broadcast('commentWrite', {
         comment: comment.id,

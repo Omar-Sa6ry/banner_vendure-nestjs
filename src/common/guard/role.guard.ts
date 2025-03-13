@@ -37,7 +37,7 @@ export class RoleGuard implements CanActivate {
 
       if (payload.id && payload.email) {
         const user = (await this.userService.findById(payload.id))?.data
-        if (!(user instanceof User)) {
+        if (!user) {
           throw new NotFoundException(
             'User with id ' + payload.id + ' not found',
           )

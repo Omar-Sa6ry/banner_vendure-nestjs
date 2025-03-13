@@ -53,8 +53,8 @@ export class MessageService {
 
     const data: messageInput = {
       ...message.dataValues,
-      sender: sender.dataValues,
-      receiver: receiver.dataValues,
+      sender,
+      receiver,
     }
 
     const relationCacheKey = `message:${senderId}:${receiver.id}`

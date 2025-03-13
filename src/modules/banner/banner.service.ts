@@ -79,7 +79,6 @@ export class BannerService {
         { transaction },
       )
 
-      console.log('mkjij', banner.dataValues)
       const data: BannerInput = {
         ...banner.dataValues,
         views: 0,

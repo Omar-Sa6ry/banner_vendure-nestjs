@@ -32,7 +32,7 @@ export class PartnerService {
     if (!campaign)
       throw new NotFoundException(await this.i18n.t('campaign.NOT_FOUND'))
 
-    const user = await (await this.userRepo.findByPk(userId))?.dataValues
+    const user = await await this.userRepo.findByPk(userId)
     if (!user) throw new NotFoundException(await this.i18n.t('user.NOT_FOUND'))
 
     const transaction = await this.campaignRepo.sequelize.transaction()
@@ -46,10 +46,14 @@ export class PartnerService {
         { transaction },
       )
       user.role = Role.PARTNER
-      user.save()
-      partner.save()
+      await user.save()
+      await partner.save()
 
-      const data: partnerInput = { ...partner.dataValues, user, campaign }
+      const data: partnerInput = {
+        ...partner.dataValues,
+        user: user.dataValues,
+        campaign,
+      }
 
       const relationCacheKey = `partner:${partner.id}`
       await this.redisService.set(relationCacheKey, data)

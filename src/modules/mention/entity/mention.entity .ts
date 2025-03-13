@@ -19,17 +19,17 @@ import {
   indexes: [
     {
       name: 'idx_post_mention',
-      fields: ['postId', 'mentionFrom', 'mentionTo'],
+      fields: ['postId', 'mentionFromId', 'mentionToId'],
       unique: true,
     },
     {
       name: 'idx_comment_mention',
-      fields: ['commentId', 'mentionFrom', 'mentionTo'],
+      fields: ['commentId', 'mentionFromId', 'mentionToId'],
       unique: true,
     },
     {
       name: 'idx_reply_mention',
-      fields: ['replyId', 'mentionFrom', 'mentionTo'],
+      fields: ['replyId', 'mentionFromId', 'mentionToId'],
       unique: true,
     },
   ],

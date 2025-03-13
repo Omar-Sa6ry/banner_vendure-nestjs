@@ -110,10 +110,9 @@ export class AuthService {
   ): Promise<AuthInputResponse> {
     const { email, password } = loginDto
 
-    let user = await (
-      await this.userService.findByEmail(email.toLowerCase())
-    )?.data
-    if (!(user instanceof User))
+    let user = await this.userRepo.findOne({ where: { email } })
+
+    if (!user)
       throw new BadRequestException(await this.i18n.t('user.EMAIL_WRONG'))
 
     await ComparePassword(password, user?.password)
